@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:repository="http://www.springframework.org/schema/data/repository"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:jms="http://www.springframework.org/schema/jms"
+	xmlns:amq="http://activemq.apache.org/schema/core"
+	xsi:schemaLocation="http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-4.3.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.8.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/data/repository http://www.springframework.org/schema/data/repository/spring-repository-1.11.xsd
+		http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
+
+	<context:component-scan base-package="com.chaaps.syena"></context:component-scan>
+	<jpa:repositories base-package="com.chaaps.syena.repositories"></jpa:repositories>
+	<tx:annotation-driven />
+	<mvc:annotation-driven />
+	<jms:annotation-driven />
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory"></property>
+		<property name="jpaDialect">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"></bean>
+		</property>
+	</bean>
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="persistenceUnitName" value="syena"></property>
+		<property name="packagesToScan" value="com.chaaps.syena.entities"></property>
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="database" value="MYSQL"></property>
+				<property name="showSql" value="true"></property>
+				<property name="databasePlatform" value="org.hibernate.dialect.MySQL5Dialect"></property>
+				<property name="generateDdl" value="true"></property>
+			</bean>
+		</property>
+		<property name="jpaProperties">
+			<value>
+
+				hibernate.generate_statistics = false
+				hibernate.hbm2ddl.auto=update
+				hibernate.jdbc.batch.size=30
+				hibernate.order.inserts=false
+				hibernate.order.updates=false
+				hibernate.jdbc.batch_versioned_data=true
+			</value>
+		</property>
+	</bean>
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="username" value="root"></property>
+		<property name="password" value="admin"></property>
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+		<property name="url"
+			value="jdbc:mysql://localhost:3306/syena?useSSL=false"></property>
+	</bean>
+	<!-- hibernate.cache.use_second_level_cache = false hibernate.cache.region.factory_class 
+		= org.hibernate.cache.ehcache.EhCacheRegionFactory hibernate.cache.use_query_cache 
+		= true -->
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.gmail.com"></property>
+		<property name="username" value="sitiraju.kalyani@gmail.com"></property>
+		<property name="password" value="arunachalam"></property>
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.socketFactory.port">465</prop>
+				<prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+				<prop key="mail.smtp.port">465</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="pinTemplateMessage" class="org.springframework.mail.SimpleMailMessage">
+		<property name="from" value="sitiraju.kalyani@gmail.com" />
+		<property name="subject" value="Syena Verification PIN " />
+	</bean>
+
+	<bean id="jmsListenerContainerFactory"
+		class="org.springframework.jms.config.DefaultJmsListenerContainerFactory">
+		<property name="connectionFactory" ref="activeConnFactory"></property>
+	</bean>
+	<!-- <bean id="jmsConnFactory"
+		class="org.springframework.jms.connection.CachingConnectionFactory">
+		<property name="targetConnectionFactory" ref="activeConnFactory"></property>
+	</bean> -->
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="activeConnFactory"></property>
+		<property name="defaultDestinationName" value="location_update_queue"></property>
+	</bean>
+	<amq:broker useJmx="false" persistent="false">
+		<amq:transportConnectors>
+			<amq:transportConnector uri="tcp://localhost:0" />
+		</amq:transportConnectors>
+	</amq:broker>
+
+	<amq:connectionFactory id="activeConnFactory"
+		brokerURL="vm://localhost" />
+</beans>
