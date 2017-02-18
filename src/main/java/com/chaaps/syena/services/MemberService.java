@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.chaaps.syena.entities.Member;
 import com.chaaps.syena.entities.MemberRegistration;
+import com.chaaps.syena.entities.virtual.MemberIdEmailInstallationIdDataObject;
 import com.chaaps.syena.repositories.MemberRepository;
 
 @Service
@@ -45,6 +46,34 @@ public class MemberService {
 		if (StringUtils.isBlank(email))
 			return null;
 		return this.memberRepository.findByEmail(email);
+	}
+
+	public Long findIdByEmail(String email) {
+		logger.debug("In MemberService. Querying for Member by email : " + email);
+		if (StringUtils.isBlank(email))
+			return null;
+		return this.memberRepository.findIdByEmail(email);
+	}
+
+	public Long findIdByEmailAndInstallationId(String email, String installationId) {
+		logger.debug("In MemberService. Querying for Member by email : " + email);
+		if (StringUtils.isBlank(email))
+			return null;
+		return this.memberRepository.findIdByEmailAndInstallationId(email, installationId);
+	}
+
+	public MemberIdEmailInstallationIdDataObject findEmailInstIdByEmail(String email) {
+		logger.debug("In MemberService. Querying for Member by email : " + email);
+		if (StringUtils.isBlank(email))
+			return null;
+		return this.memberRepository.findEmailInstIdByEmail(email);
+	}
+
+	public Long countActiveMembersByEmailAndInstallationId(String email, String installationId) {
+		logger.debug("In MemberService. Querying for Member by email : " + email);
+		if (StringUtils.isBlank(email))
+			return null;
+		return this.memberRepository.countByEmailAndInstallationIdAndActive(email, installationId, true);
 	}
 
 	@Transactional

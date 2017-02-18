@@ -38,6 +38,7 @@ public class Watch implements Serializable {
 	private boolean targetAccepted;
 	private List<WatchConfiguration> watchConfigurations;
 	private String status;
+	private String watchName;
 	private WatchInstance watchInstance;
 	private Set<WatchMessage> watchMessages;
 
@@ -114,6 +115,22 @@ public class Watch implements Serializable {
 	}
 
 	// uni-directional many-to-one association to WatchConfiguration
+
+	/**
+	 * @return the watchName
+	 */
+	@Column(name = "WATCH_NAME")
+	public String getWatchName() {
+		return watchName;
+	}
+
+	/**
+	 * @param watchName
+	 *            the watchName to set
+	 */
+	public void setWatchName(String watchName) {
+		this.watchName = watchName;
+	}
 
 	@OneToMany(mappedBy = "watch")
 	public List<WatchConfiguration> getWatchConfigurations() {

@@ -25,7 +25,11 @@ import org.springframework.stereotype.Controller;
 import com.chaaps.syena.entities.Member;
 import com.chaaps.syena.entities.MemberTransaction;
 import com.chaaps.syena.entities.Watch;
-import com.chaaps.syena.exceptions.SyenaException;
+import com.chaaps.syena.entities.virtual.WatchDataObject;
+import com.chaaps.syena.entities.virtual.WatcherDataObject;
+import com.chaaps.syena.exceptions.InvalidEmailException;
+import com.chaaps.syena.exceptions.InvalidInstallationIdException;
+import com.chaaps.syena.exceptions.InvalidMemberException;
 import com.chaaps.syena.services.MemberService;
 import com.chaaps.syena.services.MemberTransactionService;
 import com.chaaps.syena.services.WatchService;
@@ -38,6 +42,7 @@ import com.chaaps.syena.web.request.TagByCodeRequest;
 import com.chaaps.syena.web.request.WatchAccessRequest;
 import com.chaaps.syena.web.response.EmailVerifyResponse;
 import com.chaaps.syena.web.response.GetWatchersResponse;
+import com.chaaps.syena.web.response.GetWatchesResponse;
 import com.chaaps.syena.web.response.LocationResponse;
 import com.chaaps.syena.web.response.PinValidationResponse;
 import com.chaaps.syena.web.response.TagByCodeResponse;
@@ -77,7 +82,7 @@ public class MemberController {
 	 *            Throwable whose stack trace is required
 	 * @return String representing the stack trace of the exception
 	 */
-	public String getStackTrace(Throwable t) {
+	public String getStackTrace(Throwable t) {// TODO remove this
 		StringWriter stringWritter = new StringWriter();
 		PrintWriter printWritter = new PrintWriter(stringWritter, true);
 		t.printStackTrace(printWritter);
@@ -601,31 +606,29 @@ public class MemberController {
 			@QueryParam(Constants.EMAIL) String email) {
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
-			return null;
+			throw new InvalidInstallationIdException();
 		}
-		if (StringUtils.isBlank(email)) {
+		String validRes1 = ValidationUtils.validateEmail(email);
+		if (validRes1 != null) {
 			logger.debug("Email is empty, returning error response");
-			return null;
+			throw new InvalidEmailException(validRes1 + " " + email);
 		}
-		try {
-			Member member = memberService.findByEmail(email);
-			if (member == null || !member.isActive() || !member.getInstallationId().equals(installationId)) {
-				logger.debug("Valid 'Member' entry not found with email : " + email + ", returning...");
-				return null;
-			}
-			GetWatchersResponse response = new GetWatchersResponse();
-			List<Member> watchers = watchService.findOriginMembersByTargetMember(member);
-
-			for (Member m : watchers) {
-				response.addEntry(m.getEmail(), m.getDisplayName());
-			}
-
-			return response;
-		} catch (Exception e) {
-			logger.error(getStackTrace(e));
-			e.printStackTrace();
-			return null;
+		Long memberCount = memberService.countActiveMembersByEmailAndInstallationId(email, installationId);
+		if (memberCount <= 0) {
+			logger.debug("Valid 'Member' entry not found with email : " + email + ", returning...");
+			throw new InvalidMemberException(email);
 		}
+
+		GetWatchersResponse response = new GetWatchersResponse();
+		logger.debug("Querying for origin member email and acceptance");
+		List<WatcherDataObject> watchers = watchService.findWatchersByTargetMemberEmail(email);
+		for (WatcherDataObject m : watchers) {
+			logger.debug("Adding entry for : " + m.getOriginMemberEmail());
+			response.addEntry(m.getOriginMemberEmail(), m.getWatchName(), m.getTargetAccepted());
+		}
+
+		logger.debug("Returning response for getWatchers()");
+		return response;
 
 	}
 
@@ -661,8 +664,37 @@ public class MemberController {
 		logger.debug("Returning success response");
 		return Response.ok().build();
 	}
-	// @GET
-	// @Path("/get-watches")
-	// @Produces(MediaType.APPLICATION_JSON)
 
+	@GET
+	@Path("/get-watches")
+	@Produces(MediaType.APPLICATION_JSON)
+	public GetWatchesResponse getWatches(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
+			@QueryParam(Constants.EMAIL) String email) {
+
+		if (StringUtils.isBlank(installationId)) {
+			logger.debug("Installation-Id is empty, returning error response");
+			throw new InvalidInstallationIdException();
+		}
+		String validRes1 = ValidationUtils.validateEmail(email);
+		if (validRes1 != null) {
+			logger.debug("Email is empty, returning error response");
+			throw new InvalidEmailException(validRes1 + " " + email);
+		}
+		
+		Long memberCount = memberService.countActiveMembersByEmailAndInstallationId(email, installationId);
+		if (memberCount <= 0) {
+			logger.debug("Valid 'Member' entry not found with email : " + email + ", returning...");
+			throw new InvalidMemberException(email);
+		}
+		
+		GetWatchesResponse response = new GetWatchesResponse();
+		logger.debug("Querying for origin member email and acceptance");
+		List<WatchDataObject> watches = watchService.findWatchesByOriginMemberEmail(email);
+		for (WatchDataObject m : watches) {
+			logger.debug("Adding entry for : " + m.getTargetMemberEmail());
+			response.addEntry(m.getTargetMemberEmail(), m.getWatchName(), m.getTargetAccepted());
+		}
+
+		logger.debug("Returning response for getWatchers()");
+		return response;	}
 }

@@ -4,9 +4,11 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Set;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,7 +42,7 @@ public class Member implements Serializable {
 	private Timestamp updatedDate;
 	private Set<Watch> watches;
 	private MemberRegistration memberRegistration;
-	private MemberTransaction memberTransaction;
+	// private MemberTransaction memberTransaction;
 
 	public Member() {
 	}
@@ -64,6 +66,7 @@ public class Member implements Serializable {
 		this.altitude = altitude;
 	}
 
+	@Basic(fetch = FetchType.LAZY)
 	@Column(name = "CREATED_DATE", nullable = false)
 	@Generated(GenerationTime.NEVER)
 	public Timestamp getCreatedDate() {
@@ -126,6 +129,7 @@ public class Member implements Serializable {
 		this.longitude = longitude;
 	}
 
+	@Basic(fetch = FetchType.LAZY)
 	@Column(name = "UPDATED_DATE", nullable = false)
 	@Generated(GenerationTime.NEVER)
 	public Timestamp getUpdatedDate() {
@@ -137,7 +141,7 @@ public class Member implements Serializable {
 	}
 
 	// bi-directional many-to-one association to Watch
-	@OneToMany(mappedBy = "originMember")
+	@OneToMany(mappedBy = "originMember", fetch = FetchType.LAZY)
 	public Set<Watch> getWatches() {
 		return this.watches;
 	}
@@ -179,7 +183,7 @@ public class Member implements Serializable {
 	/**
 	 * @return the memberRegistration
 	 */
-	@OneToOne(cascade = CascadeType.ALL, mappedBy = "member")
+	@OneToOne(cascade = CascadeType.ALL, mappedBy = "member", fetch = FetchType.LAZY)
 	public MemberRegistration getMemberRegistration() {
 		return memberRegistration;
 	}
@@ -195,17 +199,17 @@ public class Member implements Serializable {
 	/**
 	 * @return the memberTransaction
 	 */
-	@OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE)
-	public MemberTransaction getMemberTransaction() {
-		return memberTransaction;
-	}
+	// @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE)
+	// public MemberTransaction getMemberTransaction() {
+	// return memberTransaction;
+	// }
 
 	/**
 	 * @param memberTransaction
 	 *            the memberTransaction to set
 	 */
-	public void setMemberTransaction(MemberTransaction memberTransaction) {
-		this.memberTransaction = memberTransaction;
-	}
+	// public void setMemberTransaction(MemberTransaction memberTransaction) {
+	// this.memberTransaction = memberTransaction;
+	// }
 
 }

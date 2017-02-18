@@ -6,8 +6,10 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 @Provider
+@Component
 public class SyenaExceptionMapper implements ExceptionMapper<SyenaException> {
 	Logger logger = Logger.getLogger(SyenaExceptionMapper.class);
 

@@ -1,0 +1,92 @@
+MEMBER
+=======
+id - long
+display_name - string
+email - string
+installation_id - string
+latitude - double
+longitude - double
+altitude - double
+direction - varchar(2) values would be N,NE,S,SE,W,E...
+created_date timestamp;
+updated_date timestamp
+active - true/false
+
+WATCH
+======B 
+id - long
+origin -MEMBER
+target - MEMBER
+target_accepted boolean
+code - WATCH_STATUS -> indicates there is no valid entry in watch_instance table for this watch.
+created_date timestamp;
+updated_date timestamp
+
+WATCH_INSTANCE
+==============
+ID- long
+watch_id - WATCH
+distance_apart - double 
+altitude_apart - double 
+direction varchar(8) -> values woulbe 2,6,9 to say at your 6 (or) to your 9...
+
+created_date timestamp;
+updated_date timestamp
+
+WATCH_MESSAGE
+============
+ID LONG
+WATCH_ID - WATCH
+message - varchar(32)
+description - varchar(256)
+created_date timestamp;
+updated_date timestamp
+
+
+WATCH_HISTORY -> entry should be made on every update of watch and watch_instance tables. FOR EVERY UPDATE ON MEMBER WITH ACTIVE
+WATCH ENTRY STATUS...
+=============
+id - long
+watch_id -WATCH
+origin -MEMBER
+target - MEMBER
+origin_latitude double
+origin_longitude double
+target_latitude double
+target_longitude double
+code WATCH_STATUS
+created_date timestamp;
+updated_date timestamp
+
+
+WATCH_STATUS
+=============
+id int
+STATUS VARCHAR(16) -> values would be IN_ACTIVE,IN_RANGE,AT_BORDER,OUT_OF_RANGE,ENDED,NOT_REACHABLE, ETC
+status_desc varchar(50) 
+created_date timestamp;
+updated_date timestamp
+
+WATCH_CONFIGURATION
+===================
+id int
+ENTRYvarchar(32) -> values would be safeDistance(in mts), refreshInterval(in secs)
+value (32) -> values would be 10, 60 respectively......
+ENTRY_type varchar(20)
+TAG VARCHAR(16)
+created_date timestamp;
+updated_date timestamp
+
+MEMBER_TXN 
+==========
+ID BIGINT NOT NULL,
+	
+MEMBER_ID - Member - Unique
+PIN VARCHAR(6),
+    
+TAG_CODE VARCHAR(8) - Unique,
+    
+CREATED_DATE TIMESTAMP DEFAULT current_timestamp,
+    
+UPDATED_DATE TIMESTAMP DEFAULT current_timestamp ON UPDATE current_timestamp,
+    

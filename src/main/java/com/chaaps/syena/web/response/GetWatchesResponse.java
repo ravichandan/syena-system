@@ -4,38 +4,61 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetWatchersResponse implements Serializable {
+/**
+ * Created by sitir on 13-02-2017.
+ */
+
+public class GetWatchesResponse implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 3358182997365163161L;
-	private List<Entry> watchers;
+	private static final long serialVersionUID = -6732734458240496034L;
+
+	private String email;
+
+	private List<GetWatchesResponse.Entry> watchEntries;
 
 	/**
-	 * @return the watchers
+	 * @return the watchEntries
 	 */
-	public List<Entry> getWatchers() {
-		return watchers;
+	public List<GetWatchesResponse.Entry> getWatchMembers() {
+		return watchEntries;
 	}
 
 	/**
-	 * @param watchers
-	 *            the watchers to set
+	 * @param watchEntries
+	 *            the watchEntries to set
 	 */
-	public void setWatchers(List<Entry> watchers) {
-		this.watchers = watchers;
+	public void setWatchMembers(List<GetWatchesResponse.Entry> watchMembers) {
+		this.watchEntries = watchMembers;
 	}
 
 	public void addEntry(String email, String name, boolean enabled) {
-		if (watchers == null)
-			watchers = new ArrayList<>();
-		watchers.add(new Entry(email, name, enabled));
+		if (watchEntries == null)
+			watchEntries = new ArrayList<>();
+		watchEntries.add(new GetWatchesResponse.Entry(email, name, enabled));
+
+	}
+
+	/**
+	 * @return the email
+	 */
+	public String getEmail() {
+		return email;
+	}
+
+	/**
+	 * @param email
+	 *            the email to set
+	 */
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	static class Entry implements Serializable {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = -8090556785484270675L;
 		String email;
@@ -46,34 +69,27 @@ public class GetWatchersResponse implements Serializable {
 			this.email = email;
 			this.name = name;
 			this.enabled = enabled;
+
 		}
 
-		/**
-		 * @return the email
-		 */
+		@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return "{email: \"" + email + "\", name: " + name + "\"}";
+		}
+
 		public String getEmail() {
 			return email;
 		}
 
-		/**
-		 * @param email
-		 *            the email to set
-		 */
 		public void setEmail(String email) {
 			this.email = email;
 		}
 
-		/**
-		 * @return the name
-		 */
 		public String getName() {
 			return name;
 		}
 
-		/**
-		 * @param name
-		 *            the name to set
-		 */
 		public void setName(String name) {
 			this.name = name;
 		}
@@ -92,11 +108,6 @@ public class GetWatchersResponse implements Serializable {
 		public void setEnabled(boolean enabled) {
 			this.enabled = enabled;
 		}
-
-		@Override
-		public String toString() {
-			// TODO Auto-generated method stub
-			return "{email: \"" + email + "\", name: " + name + "\"}";
-		}
 	}
+
 }

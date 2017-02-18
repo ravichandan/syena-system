@@ -14,6 +14,8 @@ import com.chaaps.syena.entities.Member;
 import com.chaaps.syena.entities.Watch;
 import com.chaaps.syena.entities.WatchConfiguration;
 import com.chaaps.syena.entities.WatchInstance;
+import com.chaaps.syena.entities.virtual.WatchDataObject;
+import com.chaaps.syena.entities.virtual.WatcherDataObject;
 import com.chaaps.syena.exceptions.NoWatchAccessException;
 import com.chaaps.syena.exceptions.SyenaException;
 import com.chaaps.syena.repositories.WatchRepository;
@@ -184,6 +186,20 @@ public class WatchService {
 		return watchRepository.findOriginMembersByTargetMember(targetMember);
 	}
 
+	public List<WatcherDataObject> findWatchersByTargetMemberEmail(String targetMemberEmail) {
+		logger.debug("Received request to get all Watching members by target member email : " + targetMemberEmail);
+		if (targetMemberEmail == null)
+			return null;
+		return watchRepository.findWatchersByTargetMemberEmail(targetMemberEmail);
+	}
+
+	public List<WatchDataObject> findWatchesByOriginMemberEmail(String originMemberEmail) {
+		logger.debug("Received request to get all Watching members of origin member email : " + originMemberEmail);
+		if (originMemberEmail == null)
+			return null;
+		return watchRepository.findWatchesByOriginMemberEmail(originMemberEmail);
+	}
+
 	public List<Member> findOriginMembersByTargetMemberWithActiveWatchStatus(
 			@Param("targetMember") Member targetMember) {
 		if (targetMember == null)
@@ -269,7 +285,8 @@ public class WatchService {
 		}
 		if (!w.isTargetAccepted()) {
 			logger.debug("Target has not yet given access to the watcher(origin). ");
-			throw new NoWatchAccessException("Target has not yet given access to the watcher");
+			throw new NoWatchAccessException();// "Target has not yet given
+												// access to the watcher");
 		}
 		if (w.getWatchInstance() == null) {
 			logger.debug("Creating a new WatchInstance");

@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.chaaps.syena.entities.Member;
 import com.chaaps.syena.entities.MemberTransaction;
+import com.chaaps.syena.entities.virtual.MemberIdEmailInstallationIdDataObject;
+import com.chaaps.syena.exceptions.InvalidMemberException;
 import com.chaaps.syena.repositories.MemberTransactionRepository;
 import com.chaaps.syena.util.RandomGenerator;
 import com.chaaps.syena.web.response.EmailVerifyResponse;
@@ -103,7 +105,7 @@ public class MemberTransactionService {
 			mt.setMember(member);
 			mt.setPin(pin);
 			mt.setTxnInstallationId(installationId);
-			member.setMemberTransaction(mt);
+			// member.setMemberTransaction(mt);
 			memberTransactionRepository.save(mt);
 		}
 		logger.info("Sending request to send PIN as an email");
@@ -126,22 +128,28 @@ public class MemberTransactionService {
 			logger.error("'PIN' should not be empty");
 			return PinValidationResponse.INVALID_PIN;
 		}
-		Member member = memberService.findByEmail(email);
-		if (member == null || StringUtils.isBlank(member.getInstallationId())) {
+		MemberIdEmailInstallationIdDataObject memberDO = memberService.findEmailInstIdByEmail(email);
+
+		if (memberDO == null || memberDO.getId() == null || memberDO.getId() == 0) {
 			logger.debug("Valid 'Member' entry not found with email : " + email + ", returning...");
-			return PinValidationResponse.NO_VALID_MEMBER;
+			throw new InvalidMemberException(email);
 		}
-		if (member.getInstallationId().equals(installationId)) {
-			logger.debug("User is already registered. Sending success response");
+		if (memberDO.getInstallationId().equals(installationId)) {
+			logger.debug("Member is already registered.");
 			return PinValidationResponse.SUCCESS;
 		}
-		MemberTransaction mt = memberTransactionRepository.findByMemberAndTxnInstallationId(member, installationId);
+		MemberTransaction mt = memberTransactionRepository.findByMemberIdAndTxnInstallationId(memberDO.getId(),
+				installationId);
 		if (mt == null || StringUtils.isEmpty(mt.getPin()) || (!mt.getPin().equals(pin))) {
 			logger.debug("No PIN for this email found in Syena. Returning...");
 			return PinValidationResponse.NO_VALID_MEMBER_TXN;
 		}
-		logger.debug("Given pin is valid. Removing the temporary pin");
-		mt.setPin(null);
+		logger.debug("Given pin is valid. Removing the temporary pin & installation-id");
+		memberTransactionRepository.deleteByMemberId(memberDO.getId());
+		/*
+		 * mt.setPin(null); member.setInstallationId(installationId);
+		 * mt.setTxnInstallationId(null);
+		 */
 		logger.debug("Sending success response");
 		return PinValidationResponse.SUCCESS;
 	}
