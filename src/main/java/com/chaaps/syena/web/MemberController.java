@@ -498,7 +498,7 @@ public class MemberController {
 	}
 
 	@GET
-	@Path("/location")
+	@Path("/get-location")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public LocationResponse getLocation(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
