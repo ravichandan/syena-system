@@ -2,22 +2,22 @@ package com.chaaps.syena.web.request;
 
 public class TagByCodeRequest {
 
-	private String email;
+	private String requester;
 	private String tagCode;
 
 	/**
-	 * @return the email
+	 * @return the QP_REQUESTER
 	 */
-	public String getEmail() {
-		return email;
+	public String getRequester() {
+		return requester;
 	}
 
 	/**
-	 * @param email
-	 *            the email to set
+	 * @param QP_REQUESTER
+	 *            the QP_REQUESTER to set
 	 */
-	public void setEmail(String email) {
-		this.email = email;
+	public void setRequester(String requester) {
+		this.requester = requester;
 	}
 
 	/**

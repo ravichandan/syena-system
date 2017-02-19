@@ -35,7 +35,7 @@ public class LocationUpdateComponent {
 	public void receiveMessage(LocationUpdateRequest locationUpdateRequest) {
 		logger.info("JmsMessage received to update member's location : " + locationUpdateRequest);
 
-		Member member = memberService.findByEmail(locationUpdateRequest.getEmail());
+		Member member = memberService.findByEmail(locationUpdateRequest.getRequester());
 		if (member == null) {
 			return;
 		}

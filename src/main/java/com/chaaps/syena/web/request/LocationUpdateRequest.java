@@ -8,24 +8,24 @@ public class LocationUpdateRequest implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 3743097591720874219L;
-	private String email;
+	private String requester;
 	private double latitude;
 	private double longitude;
 	private double altitude;
 
 	/**
-	 * @return the email
+	 * @return the QP_REQUESTER
 	 */
-	public String getEmail() {
-		return email;
+	public String getRequester() {
+		return requester;
 	}
 
 	/**
-	 * @param email
-	 *            the email to set
+	 * @param QP_REQUESTER
+	 *            the QP_REQUESTER to set
 	 */
-	public void setEmail(String email) {
-		this.email = email;
+	public void setRequester(String requester) {
+		this.requester = requester;
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class LocationUpdateRequest implements Serializable{
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return "LocationUpdateRequest - Email : " + email + ", latitude : " + latitude + ", longitude : " + longitude
+		return "LocationUpdateRequest - Email : " + requester + ", latitude : " + latitude + ", longitude : " + longitude
 				+ ", altitude : " + altitude;
 	}
 }

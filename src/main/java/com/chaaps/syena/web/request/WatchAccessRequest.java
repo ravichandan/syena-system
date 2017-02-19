@@ -2,40 +2,40 @@ package com.chaaps.syena.web.request;
 
 public class WatchAccessRequest {
 
-	private String email;
+	private String requester;
 
-	private String revokeeEmail;
+	private String target;
 
 	private boolean flag;
 
 	/**
-	 * @return the email
+	 * @return the requester
 	 */
-	public String getEmail() {
-		return email;
+	public String getRequester() {
+		return requester;
 	}
 
 	/**
-	 * @param email
-	 *            the email to set
+	 * @param requester
+	 *            the requester to set
 	 */
-	public void setEmail(String email) {
-		this.email = email;
+	public void setRequester(String requester) {
+		this.requester = requester;
 	}
 
 	/**
-	 * @return the revokeeEmail
+	 * @return the target
 	 */
-	public String getRevokeeEmail() {
-		return revokeeEmail;
+	public String getTarget() {
+		return target;
 	}
 
 	/**
-	 * @param revokeeEmail
-	 *            the revokeeEmail to set
+	 * @param target
+	 *            the target to set
 	 */
-	public void setRevokeeEmail(String revokeeEmail) {
-		this.revokeeEmail = revokeeEmail;
+	public void setTarget(String target) {
+		this.target = target;
 	}
 
 	/**
@@ -52,5 +52,4 @@ public class WatchAccessRequest {
 	public void setFlag(boolean flag) {
 		this.flag = flag;
 	}
-
 }

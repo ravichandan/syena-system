@@ -7,7 +7,7 @@ package com.chaaps.syena.web.request;
 public class PinValidationRequest {
 
 	private String pin;
-	private String email;
+	private String requester;
 
 	public String getPin() {
 		return pin;
@@ -17,12 +17,12 @@ public class PinValidationRequest {
 		this.pin = pin;
 	}
 
-	public String getEmail() {
-		return email;
+	public String getRequester() {
+		return requester;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setRequester(String requester) {
+		this.requester = requester;
 	}
 
 }

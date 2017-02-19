@@ -17,7 +17,7 @@ public class EmailTest {
 		*/
 
 		PinValidationRequest req = new PinValidationRequest();
-		req.setEmail("chan@g.com");
+		req.setRequester("chan@g.com");
 //		req.setInstallationId("sfd");
 		req.setPin("3424");
 		ObjectMapper mapper = new ObjectMapper();

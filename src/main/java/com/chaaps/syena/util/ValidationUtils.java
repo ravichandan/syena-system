@@ -10,24 +10,24 @@ public class ValidationUtils {
 	 * @param email
 	 * @return
 	 */
-	public static String validateEmail(String email) {
+	public static StringBuilder validateEmail(String email) {
 		// TODO
 		if (StringUtils.isBlank(email) || !email.contains("@"))
-			return "Invalid email";
+			return new StringBuilder(" Invalid email ");
 		return null;
 	}
 
-	public static String validatePin(String pin) {
+	public static StringBuilder validatePin(String pin) {
 		// TODO
 		if (StringUtils.isBlank(pin))
-			return "Invalid PIN";
+			return new StringBuilder("Invalid PIN");
 		return null;
 	}
 
-	public static String validateTagCode(String tagCode) {
+	public static StringBuilder validateTagCode(String tagCode) {
 		// TODO
 		if (StringUtils.isBlank(tagCode))
-			return "Invalid TagCode";
+			return new StringBuilder("Invalid TagCode");
 		return null;
 	}
 }

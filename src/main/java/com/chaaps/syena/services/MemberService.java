@@ -63,14 +63,14 @@ public class MemberService {
 	}
 
 	public MemberIdEmailInstallationIdDataObject findEmailInstIdByEmail(String email) {
-		logger.debug("In MemberService. Querying for Member by email : " + email);
+		logger.debug("In MemberService. Querying for MemberIdEmailInstallationIdDataObject by email : " + email);
 		if (StringUtils.isBlank(email))
 			return null;
 		return this.memberRepository.findEmailInstIdByEmail(email);
 	}
 
 	public Long countActiveMembersByEmailAndInstallationId(String email, String installationId) {
-		logger.debug("In MemberService. Querying for Member by email : " + email);
+		logger.debug("In MemberService. Counting for all 'Member's by email & installationId: " + email);
 		if (StringUtils.isBlank(email))
 			return null;
 		return this.memberRepository.countByEmailAndInstallationIdAndActive(email, installationId, true);

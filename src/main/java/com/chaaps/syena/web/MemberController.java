@@ -30,6 +30,7 @@ import com.chaaps.syena.entities.virtual.WatcherDataObject;
 import com.chaaps.syena.exceptions.InvalidEmailException;
 import com.chaaps.syena.exceptions.InvalidInstallationIdException;
 import com.chaaps.syena.exceptions.InvalidMemberException;
+import com.chaaps.syena.exceptions.InvalidWatchException;
 import com.chaaps.syena.services.MemberService;
 import com.chaaps.syena.services.MemberTransactionService;
 import com.chaaps.syena.services.WatchService;
@@ -117,22 +118,24 @@ public class MemberController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public EmailVerifyResponse getOrCreateMember(@HeaderParam(value = Constants.INSTALLATION_ID) String installationId,
-			@QueryParam(Constants.EMAIL) String email) {
+			@QueryParam(Constants.QP_REQUESTER) String requester) {
 
-		logger.debug("In getOrCreateMember() " + email + ", InstallationId " + installationId);
+		logger.debug("In getOrCreateMember() " + requester + ", InstallationId " + installationId);
 		EmailVerifyResponse response = new EmailVerifyResponse();
 		try {
-			String emailValidRes = ValidationUtils.validateEmail(email);
-			if (!StringUtils.isBlank(emailValidRes)) {
-				logger.debug("Email validation failed. Returning error response");
-				response.setError(new EmailVerifyResponse.Error());
-				response.getError().setErrorMessage(emailValidRes);
-				response.setStatus(EmailVerifyResponse.INVALID_EMAIL);
-				response.setEmail(email);
-				return response;
+			{
+				StringBuilder emailValidRes = ValidationUtils.validateEmail(requester);
+				if (emailValidRes != null) {
+					logger.debug("Email validation failed. Returning error response");
+					response.setError(new EmailVerifyResponse.Error());
+					response.getError().setErrorMessage(emailValidRes.toString());
+					response.setStatus(EmailVerifyResponse.INVALID_EMAIL);
+					response.setEmail(requester);
+					return response;
+				}
 			}
-			Member member = memberService.findByEmail(email);
-			response.setEmail(email);
+			Member member = memberService.findByEmail(requester);
+			response.setEmail(requester);
 
 			if (StringUtils.isEmpty(installationId)) {// user installed the app
 														// for the first time
@@ -143,11 +146,11 @@ public class MemberController {
 			if (member == null) {
 				logger.debug("Member entry not found for given email. Creating a new one..");
 				response.setStatus(EmailVerifyResponse.NEW_ENTRY);
-				response.setEmailSent(memberTransactionService.generatePinAndSendEmail(email,
+				response.setEmailSent(memberTransactionService.generatePinAndSendEmail(requester,
 						installationId) == EmailVerifyResponse.SUCCESS);
 				return response;
 			}
-			member = memberService.findByEmail(email);
+			member = memberService.findByEmail(requester);
 			if (member.getInstallationId().equals(installationId)) {
 				logger.debug("'Installation-Id' matches. Returning success response");
 				response.setStatus(EmailVerifyResponse.SUCCESS);
@@ -155,7 +158,7 @@ public class MemberController {
 				logger.debug("'Installation-Id' matches. Probably user is logging into a new device");
 
 				response.setStatus(EmailVerifyResponse.NEW_DEVICE);
-				response.setEmailSent(memberTransactionService.generatePinAndSendEmail(email,
+				response.setEmailSent(memberTransactionService.generatePinAndSendEmail(requester,
 						installationId) == EmailVerifyResponse.SUCCESS);
 			}
 		} catch (Exception e) {
@@ -182,18 +185,19 @@ public class MemberController {
 			response.setStatus(PinValidationResponse.INVALID_INSTALLATION_ID);
 			return response;
 		}
-
-		String validationResult = ValidationUtils.validatePin(pinValidationRequest.getPin());
-		if (StringUtils.isNotBlank(validationResult)) {
-			logger.debug("PIN validation failed. Returning error response");
-			response.setStatus(PinValidationResponse.INVALID_PIN);
-			return response;
+		{
+			StringBuilder validationResult = ValidationUtils.validatePin(pinValidationRequest.getPin());
+			if (validationResult != null) {
+				logger.debug("PIN validation failed. Returning error response");
+				response.setStatus(PinValidationResponse.INVALID_PIN);
+				return response;
+			}
 		}
 		try {
-			int result = memberTransactionService.validatePin(pinValidationRequest.getEmail(), installationId,
+			int result = memberTransactionService.validatePin(pinValidationRequest.getRequester(), installationId,
 					pinValidationRequest.getPin());
 			if (result == PinValidationResponse.SUCCESS) {
-				memberService.activateMember(pinValidationRequest.getEmail());
+				memberService.activateMember(pinValidationRequest.getRequester());
 			}
 			response.setStatus(result);
 		} catch (Exception e) {
@@ -210,8 +214,8 @@ public class MemberController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public TagCodeGenerationResponse generateTagCode(
 			@HeaderParam(value = Constants.INSTALLATION_ID) String installationId,
-			@QueryParam(Constants.EMAIL) String email) {
-		logger.debug("In generateTagCode() " + email + ", installationId " + installationId);
+			@QueryParam(Constants.QP_REQUESTER) String requester) {
+		logger.debug("In generateTagCode() " + requester + ", installationId " + installationId);
 
 		TagCodeGenerationResponse response = new TagCodeGenerationResponse();
 		if (StringUtils.isBlank(installationId)) {
@@ -219,15 +223,15 @@ public class MemberController {
 			response.setStatus(TagCodeGenerationResponse.INVALID_INSTALLATION_ID);
 			return response;
 		}
-		if (ValidationUtils.validateEmail(email) != null) {
+		if (ValidationUtils.validateEmail(requester) != null) {
 			logger.error("Invalid Email");
 			response.setStatus(TagCodeGenerationResponse.INVALID_EMAIL);
 			return response;
 
 		}
-		Member member = memberService.findByEmail(email);
+		Member member = memberService.findByEmail(requester);
 		if (member == null) {
-			logger.debug("Valid 'Member' entry not found with email : " + email + ", returning...");
+			logger.debug("Valid 'Member' entry not found with email : " + requester + ", returning...");
 			response.setStatus(TagCodeGenerationResponse.NO_VALID_MEMBER);
 			return response;
 
@@ -243,7 +247,7 @@ public class MemberController {
 			return response;
 		}
 		String tagCode = RandomGenerator.generate6CharacterTagCode();
-		logger.debug("TagCode has been generated for : " + email);
+		logger.debug("TagCode has been generated for : " + requester);
 		try {
 			memberTransactionService.saveTagCode(member, tagCode);
 			response.setTagCode(tagCode);
@@ -277,16 +281,16 @@ public class MemberController {
 			response.setStatus(TagByCodeResponse.INVALID_TAG_CODE);
 			return response;
 		}
-		if (ValidationUtils.validateEmail(tagByCodeRequest.getEmail()) != null) {
+		if (ValidationUtils.validateEmail(tagByCodeRequest.getRequester()) != null) {
 			logger.debug("Email is invalid. Returning...");
 			response.setStatus(TagByCodeResponse.INVALID_EMAIL);
 			return response;
 		}
-		response.setEmail(tagByCodeRequest.getEmail());
+		response.setEmail(tagByCodeRequest.getRequester());
 		try {
-			Member m1 = memberService.findByEmail(tagByCodeRequest.getEmail());
+			Member m1 = memberService.findByEmail(tagByCodeRequest.getRequester());
 			if (m1 == null) {
-				logger.debug("Valid 'Member' entry not found with email : " + tagByCodeRequest.getEmail()
+				logger.debug("Valid 'Member' entry not found with email : " + tagByCodeRequest.getRequester()
 						+ ", returning...");
 				response.setStatus(TagByCodeResponse.NO_VALID_MEMBER);
 				return response;
@@ -333,21 +337,20 @@ public class MemberController {
 	@DELETE
 	@Path("/tag-code")
 	public Response removeTagCode(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
-			@QueryParam(Constants.EMAIL) String email) {// TODO verify again
-		logger.info("Received request in removeTagCode() to remove tagCode ");
+			@QueryParam(Constants.QP_REQUESTER) String requester) {// TODO verify again
+		logger.info("Request received to '/tag-code', " + requester);
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
 			return Response.notModified().build();
-
 		}
-		if (ValidationUtils.validateEmail(email) != null) {
+		if (ValidationUtils.validateEmail(requester) != null) {
 			logger.debug("Email is invalid. Returning...");
-			return Response.notModified().entity(email + " is invalid").build();
+			return Response.notModified().entity(requester + " is invalid").build();
 		}
 		try {
-			Member m1 = memberService.findByEmail(email);
+			Member m1 = memberService.findByEmail(requester);
 			if (m1 == null) {
-				logger.debug("Valid 'Member' entry not found with email : " + email + ", returning...");
+				logger.debug("Valid 'Member' entry not found with email : " + requester + ", returning...");
 				return Response.notModified().entity("Valid 'Member' entry not found with given email").build();
 			}
 			if (!m1.isActive()) {
@@ -375,19 +378,19 @@ public class MemberController {
 	public Response updateLocation(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
 			LocationUpdateRequest locationUpdateRequest) {
 
-		logger.info("Received request in updateLocation() to update location");
+		logger.info("Request received to '/location'");
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
 			return Response.notModified().build();
 		}
-		if (ValidationUtils.validateEmail(locationUpdateRequest.getEmail()) != null) {
+		if (ValidationUtils.validateEmail(locationUpdateRequest.getRequester()) != null) {
 			logger.debug("Email is invalid. Returning...");
 			return Response.notModified().entity("Email is invalid.").build();
 		}
 		try {
-			Member member = memberService.findByEmail(locationUpdateRequest.getEmail());
+			Member member = memberService.findByEmail(locationUpdateRequest.getRequester());
 			if (member == null || !member.isActive() || !member.getInstallationId().equals(installationId)) {
-				logger.debug("Valid 'Member' entry not found with email : " + locationUpdateRequest.getEmail()
+				logger.debug("Valid 'Member' entry not found with email : " + locationUpdateRequest.getRequester()
 						+ ", returning...");
 				return Response.notModified().entity("Valid 'Member' entry not found with given email").build();
 			}
@@ -405,95 +408,76 @@ public class MemberController {
 	@Path("/start-watch")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response startWatch(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
-			@QueryParam(Constants.QP_REQUESTER_EMAIL) String requesterEmail,
-			@QueryParam(Constants.EMAIL) String targetEmail) {
+			@QueryParam(Constants.QP_TARGET) String targetEmail,
+			@QueryParam(Constants.QP_REQUESTER) String requesterEmail) {
 
+		logger.info("Request received to '/start-watch'," + requesterEmail);
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
-			return Response.notModified().build();
+			throw new InvalidInstallationIdException();
 		}
 		if (ValidationUtils.validateEmail(requesterEmail) != null
 				|| ValidationUtils.validateEmail(targetEmail) != null) {
 			logger.debug("Email is invalid. Returning...");
-			return Response.notModified().entity("Invalid Email").build();
+			throw new InvalidEmailException(requesterEmail);
 		}
-		// try {
 		Member originMember = memberService.findByEmail(requesterEmail);
 		if (originMember == null || !originMember.isActive()
 				|| !originMember.getInstallationId().equals(installationId)) {
 			logger.debug("Valid 'Member' entry not found with email : " + requesterEmail + ", returning...");
-			return Response.notModified()
-					.entity("Valid 'Member' entry not found with email : " + requesterEmail + ", returning...").build();
+			throw new InvalidMemberException(requesterEmail);
 
 		}
 		Member targetMember = memberService.findByEmail(targetEmail);
 		if (targetMember == null || !targetMember.isActive()) {
 			logger.debug("Valid 'Member' entry not found with email : " + targetEmail);
-			return Response.notModified().entity("Valid 'Member' entry not found with email : " + targetEmail).build();
+			throw new InvalidMemberException(targetEmail);
 
 		}
 		Watch watch = watchService.findByOriginMemberAndTargetMember(originMember, targetMember);
 		if (watch == null) {
 			logger.debug("Requester has not yet tagged the target member " + targetEmail);
-			return Response.notModified().entity("Requester has not yet tagged the target member " + targetEmail)
-					.build();
+			throw new InvalidWatchException();
 		}
 		watchService.updateWatchInstance(watch, Constants.WATCH_STATUS_STARTED);
-		logger.debug("Watch is created successfully");
-		/*
-		 * } catch (Exception e) { logger.error("Exception Occured : " +
-		 * getStackTrace(e)); e.printStackTrace(); return
-		 * Response.status(Response.Status.NOT_FOUND).entity("Ravi " +
-		 * e.getMessage()).build(); }
-		 */
-		return Response.ok("CHandan").build();
+		logger.debug("Watch is started successfully");
+		return Response.ok().build();
 	}
 
 	@POST
 	@Path("/stop-watch")
 	public Response stopWatch(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
-			@QueryParam(Constants.QP_REQUESTER_EMAIL) String requesterEmail,
-			@QueryParam(Constants.EMAIL) String targetEmail) {
+			@QueryParam(Constants.QP_TARGET) String targetEmail,
+			@QueryParam(Constants.QP_REQUESTER) String requesterEmail) {
 
+		logger.info("Request received to '/stop-watch'," + requesterEmail);
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
-			return Response.notModified().build();
+			throw new InvalidInstallationIdException();
 		}
 		if (ValidationUtils.validateEmail(requesterEmail) != null
 				|| ValidationUtils.validateEmail(targetEmail) != null) {
 			logger.debug("Email is invalid. Returning...");
-			return Response.notModified().entity("Invalid Email").build();
+			throw new InvalidEmailException(requesterEmail);
 		}
-		try {
-			Member originMember = memberService.findByEmail(requesterEmail);
-			if (originMember == null || !originMember.isActive()
-					|| !originMember.getInstallationId().equals(installationId)) {
-				logger.debug("Valid 'Member' entry not found with email : " + requesterEmail + ", returning...");
-				return Response.notModified()
-						.entity("Valid 'Member' entry not found with email : " + requesterEmail + ", returning...")
-						.build();
-
-			}
-			Member targetMember = memberService.findByEmail(targetEmail);
-			if (targetMember == null || !targetMember.isActive()) {
-				logger.debug("Valid 'Member' entry not found with email : " + targetEmail);
-				return Response.notModified().entity("Valid 'Member' entry not found with email : " + targetEmail)
-						.build();
-
-			}
-			Watch watch = watchService.findByOriginMemberAndTargetMember(originMember, targetMember);
-			if (watch == null) {
-				logger.debug("Requester has not yet tagged the target member " + targetEmail);
-				return Response.notModified().entity("Requester has not yet tagged the target member " + targetEmail)
-						.build();
-			}
-			watchService.updateWatchInstance(watch, Constants.WATCH_STATUS_IN_ACTIVE);
-			logger.debug("Watch is created successfully");
-		} catch (Exception e) {
-			logger.error("Exception Occured : " + getStackTrace(e));
-			e.printStackTrace();
-			return Response.notModified().entity(e.getMessage()).build();
+		Member originMember = memberService.findByEmail(requesterEmail);
+		if (originMember == null || !originMember.isActive()
+				|| !originMember.getInstallationId().equals(installationId)) {
+			logger.debug("Valid 'Member' entry not found with email : " + requesterEmail + ", returning...");
+			throw new InvalidMemberException(requesterEmail);
 		}
+		Member targetMember = memberService.findByEmail(targetEmail);
+		if (targetMember == null || !targetMember.isActive()) {
+			logger.debug("Valid 'Member' entry not found with email : " + targetEmail);
+			throw new InvalidMemberException(targetEmail);
+		}
+		Watch watch = watchService.findByOriginMemberAndTargetMember(originMember, targetMember);
+		if (watch == null) {
+			logger.debug("Requester has not yet tagged the target member " + targetEmail);
+			throw new InvalidWatchException();
+		}
+		watchService.updateWatchInstance(watch, Constants.WATCH_STATUS_IN_ACTIVE);
+		logger.debug("Watch is stopped successfully");
 		return Response.ok().build();
 	}
 
@@ -502,9 +486,9 @@ public class MemberController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public LocationResponse getLocation(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
-			@QueryParam(Constants.QP_REQUESTER_EMAIL) String requesterEmail,
-			@QueryParam(Constants.EMAIL) String targetEmail) {
-		logger.info("Request received to get location");
+			@QueryParam(Constants.QP_TARGET) String targetEmail,
+			@QueryParam(Constants.QP_REQUESTER) String requesterEmail) {
+		logger.info("Request received to '/get-location'," + requesterEmail);
 		LocationResponse response = new LocationResponse();
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
@@ -567,35 +551,37 @@ public class MemberController {
 
 		if (StringUtils.isBlank(installationId) || watchAccessRequest == null) {
 			logger.debug("Installation-Id is empty, returning error response");
-			return Response.notModified().build();
+			throw new InvalidInstallationIdException();
 		}
-		if (ValidationUtils.validateEmail(watchAccessRequest.getEmail()) != null
-				|| ValidationUtils.validateEmail(watchAccessRequest.getRevokeeEmail()) != null) {
-			logger.debug("Email is invalid. Returning...");
-			return Response.notModified().entity("Invalid Email").build();
+		{
+			StringBuilder res1 = ValidationUtils.validateEmail(watchAccessRequest.getRequester());
+			if (res1 != null) {
+				logger.debug("Email is invalid. Returning...");
+				throw new InvalidEmailException(res1 + " " + watchAccessRequest.getRequester());
+			}
+			res1 = ValidationUtils.validateEmail(watchAccessRequest.getTarget());
+			if (res1 != null) {
+				logger.debug("Email is invalid. Returning...");
+				throw new InvalidEmailException(res1 + " " + watchAccessRequest.getTarget());
+			}
 		}
-		try {
-			Member requesterMember = memberService.findByEmail(watchAccessRequest.getEmail());
-			if (requesterMember == null || !requesterMember.isActive()
-					|| !requesterMember.getInstallationId().equals(installationId)) {
-				logger.debug("Valid 'Member' entry not found with email : " + watchAccessRequest.getEmail()
-						+ ", returning...");
-				return Response.notModified().entity("Valid Member not found").build();
-			}
-			Member revokeeMember = memberService.findByEmail(watchAccessRequest.getRevokeeEmail());
-			if (revokeeMember == null) {
-				logger.debug("Valid 'Member' entry not found with email : " + watchAccessRequest.getRevokeeEmail()
-						+ ", returning...");
-				return Response.notModified().entity("Valid Member not found").build();
-			}
+		Member requesterMember = memberService.findByEmail(watchAccessRequest.getRequester());
+		if (requesterMember == null || !requesterMember.isActive()
+				|| !requesterMember.getInstallationId().equals(installationId)) {
+			logger.debug("Valid 'Member' entry not found with email : " + watchAccessRequest.getRequester()
+					+ ", returning...");
+			throw new InvalidMemberException(watchAccessRequest.getRequester());
+		}
+		Member targetMember = memberService.findByEmail(watchAccessRequest.getTarget());
+		if (targetMember == null || !targetMember.isActive()) {
+			logger.debug("Valid 'Member' entry not found with email : " + watchAccessRequest.getTarget()
+					+ ", returning...");
+			throw new InvalidMemberException(watchAccessRequest.getTarget());
+		}
 
-			watchService.updateTargetAccess(revokeeMember, requesterMember, watchAccessRequest.isFlag());
-			logger.debug("Successfully updated 'Target Access' ");
-		} catch (Exception e) {
-			logger.error("Exception Occured : " + getStackTrace(e));
-			e.printStackTrace();
-			return Response.serverError().entity(e.getMessage()).build();
-		}
+		watchService.updateTargetAccess(targetMember, requesterMember, watchAccessRequest.isFlag());
+		logger.debug("Successfully updated 'Watch Access' ");
+
 		return Response.ok().build();
 	}
 
@@ -603,25 +589,28 @@ public class MemberController {
 	@Path("/get-watchers")
 	@Produces(MediaType.APPLICATION_JSON)
 	public GetWatchersResponse getWatchers(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
-			@QueryParam(Constants.EMAIL) String email) {
+			@QueryParam(Constants.QP_REQUESTER) String requester) {
+		logger.info("Received request to '/get-watchers', " + requester);
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
 			throw new InvalidInstallationIdException();
 		}
-		String validRes1 = ValidationUtils.validateEmail(email);
-		if (validRes1 != null) {
-			logger.debug("Email is empty, returning error response");
-			throw new InvalidEmailException(validRes1 + " " + email);
+		{
+			StringBuilder validRes1 = ValidationUtils.validateEmail(requester);
+			if (validRes1 != null) {
+				logger.debug("Email is empty, returning error response");
+				throw new InvalidEmailException(validRes1 + " " + requester);
+			}
 		}
-		Long memberCount = memberService.countActiveMembersByEmailAndInstallationId(email, installationId);
-		if (memberCount <= 0) {
-			logger.debug("Valid 'Member' entry not found with email : " + email + ", returning...");
-			throw new InvalidMemberException(email);
+		Long memberCount = memberService.countActiveMembersByEmailAndInstallationId(requester, installationId);
+		if (memberCount == null || memberCount <= 0) {
+			logger.debug("Valid 'Member' entry not found with email : " + requester + ", returning...");
+			throw new InvalidMemberException(requester);
 		}
 
 		GetWatchersResponse response = new GetWatchersResponse();
 		logger.debug("Querying for origin member email and acceptance");
-		List<WatcherDataObject> watchers = watchService.findWatchersByTargetMemberEmail(email);
+		List<WatcherDataObject> watchers = watchService.findWatchersByTargetMemberEmail(requester);
 		for (WatcherDataObject m : watchers) {
 			logger.debug("Adding entry for : " + m.getOriginMemberEmail());
 			response.addEntry(m.getOriginMemberEmail(), m.getWatchName(), m.getTargetAccepted());
@@ -653,7 +642,7 @@ public class MemberController {
 		try {
 			JsonObject jo = parser.parse(tokenData).getAsJsonObject();
 			String regToken = jo.get(Constants.REGISTRATION_TOKEN).getAsString();
-			String email = jo.get(Constants.EMAIL).getAsString();
+			String email = jo.get(Constants.QP_REQUESTER).getAsString();
 			memberService.updateRegistration(email, regToken);
 			logger.debug("Successfully updated registration for member : " + email);
 		} catch (Exception e) {
@@ -669,32 +658,35 @@ public class MemberController {
 	@Path("/get-watches")
 	@Produces(MediaType.APPLICATION_JSON)
 	public GetWatchesResponse getWatches(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
-			@QueryParam(Constants.EMAIL) String email) {
+			@QueryParam(Constants.QP_REQUESTER) String requester) {
+		logger.info("Request received to '/get-watches', " + requester);
 
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
 			throw new InvalidInstallationIdException();
 		}
-		String validRes1 = ValidationUtils.validateEmail(email);
-		if (validRes1 != null) {
-			logger.debug("Email is empty, returning error response");
-			throw new InvalidEmailException(validRes1 + " " + email);
+		{
+			StringBuilder validRes1 = ValidationUtils.validateEmail(requester);
+			if (validRes1 != null) {
+				logger.debug("Email is empty, returning error response");
+				throw new InvalidEmailException(validRes1 + " " + requester);
+			}
 		}
-		
-		Long memberCount = memberService.countActiveMembersByEmailAndInstallationId(email, installationId);
-		if (memberCount <= 0) {
-			logger.debug("Valid 'Member' entry not found with email : " + email + ", returning...");
-			throw new InvalidMemberException(email);
+		Long memberCount = memberService.countActiveMembersByEmailAndInstallationId(requester, installationId);
+		if (memberCount == null || memberCount <= 0) {
+			logger.debug("Valid 'Member' entry not found with email : " + requester + ", returning...");
+			throw new InvalidMemberException(requester);
 		}
-		
+
 		GetWatchesResponse response = new GetWatchesResponse();
 		logger.debug("Querying for origin member email and acceptance");
-		List<WatchDataObject> watches = watchService.findWatchesByOriginMemberEmail(email);
+		List<WatchDataObject> watches = watchService.findWatchesByOriginMemberEmail(requester);
 		for (WatchDataObject m : watches) {
 			logger.debug("Adding entry for : " + m.getTargetMemberEmail());
 			response.addEntry(m.getTargetMemberEmail(), m.getWatchName(), m.getTargetAccepted());
 		}
 
 		logger.debug("Returning response for getWatchers()");
-		return response;	}
+		return response;
+	}
 }
