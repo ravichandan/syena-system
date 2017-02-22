@@ -177,7 +177,7 @@ public class MemberController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public PinValidationResponse addMember(@HeaderParam(value = Constants.INSTALLATION_ID) String installationId,
-			PinValidationRequest pinValidationRequest) {
+			@QueryParam(Constants.QP_REQUESTER) String requester, PinValidationRequest pinValidationRequest) {
 		logger.debug("In addMember() " + pinValidationRequest + ", installationId " + installationId);
 		PinValidationResponse response = new PinValidationResponse();
 		if (StringUtils.isBlank(installationId)) {
@@ -194,10 +194,9 @@ public class MemberController {
 			}
 		}
 		try {
-			int result = memberTransactionService.validatePin(pinValidationRequest.getRequester(), installationId,
-					pinValidationRequest.getPin());
+			int result = memberTransactionService.validatePin(requester, installationId, pinValidationRequest.getPin());
 			if (result == PinValidationResponse.SUCCESS) {
-				memberService.activateMember(pinValidationRequest.getRequester());
+				memberService.activateMember(requester, installationId);
 			}
 			response.setStatus(result);
 		} catch (Exception e) {
@@ -266,8 +265,13 @@ public class MemberController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public TagByCodeResponse tagMemberByCode(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
-			TagByCodeRequest tagByCodeRequest) {// TODO send diplayName with
-												// email in response
+			@QueryParam(Constants.QP_REQUESTER) String requester, TagByCodeRequest tagByCodeRequest) {// TODO
+																										// send
+																										// diplayName
+																										// with
+																										// email
+																										// in
+																										// response
 		logger.info("Received request in tagMemberByCode() to tag, Installation-Id : " + installationId);
 		TagByCodeResponse response = new TagByCodeResponse();
 
@@ -281,17 +285,16 @@ public class MemberController {
 			response.setStatus(TagByCodeResponse.INVALID_TAG_CODE);
 			return response;
 		}
-		if (ValidationUtils.validateEmail(tagByCodeRequest.getRequester()) != null) {
+		if (ValidationUtils.validateEmail(requester) != null) {
 			logger.debug("Email is invalid. Returning...");
 			response.setStatus(TagByCodeResponse.INVALID_EMAIL);
 			return response;
 		}
-		response.setEmail(tagByCodeRequest.getRequester());
+		response.setEmail(requester);
 		try {
-			Member m1 = memberService.findByEmail(tagByCodeRequest.getRequester());
+			Member m1 = memberService.findByEmail(requester);
 			if (m1 == null) {
-				logger.debug("Valid 'Member' entry not found with email : " + tagByCodeRequest.getRequester()
-						+ ", returning...");
+				logger.debug("Valid 'Member' entry not found with email : " + requester + ", returning...");
 				response.setStatus(TagByCodeResponse.NO_VALID_MEMBER);
 				return response;
 
@@ -337,7 +340,9 @@ public class MemberController {
 	@DELETE
 	@Path("/tag-code")
 	public Response removeTagCode(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
-			@QueryParam(Constants.QP_REQUESTER) String requester) {// TODO verify again
+			@QueryParam(Constants.QP_REQUESTER) String requester) {// TODO
+																	// verify
+																	// again
 		logger.info("Request received to '/tag-code', " + requester);
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
@@ -545,7 +550,7 @@ public class MemberController {
 	@Path("/watch-access")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateWatchAccess(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
-			WatchAccessRequest watchAccessRequest) {
+			@QueryParam(Constants.QP_REQUESTER) String requester, WatchAccessRequest watchAccessRequest) {
 
 		logger.info("Request received to update registration token signature");
 
@@ -554,10 +559,10 @@ public class MemberController {
 			throw new InvalidInstallationIdException();
 		}
 		{
-			StringBuilder res1 = ValidationUtils.validateEmail(watchAccessRequest.getRequester());
+			StringBuilder res1 = ValidationUtils.validateEmail(requester);
 			if (res1 != null) {
 				logger.debug("Email is invalid. Returning...");
-				throw new InvalidEmailException(res1 + " " + watchAccessRequest.getRequester());
+				throw new InvalidEmailException(res1 + " " + requester);
 			}
 			res1 = ValidationUtils.validateEmail(watchAccessRequest.getTarget());
 			if (res1 != null) {
@@ -565,17 +570,16 @@ public class MemberController {
 				throw new InvalidEmailException(res1 + " " + watchAccessRequest.getTarget());
 			}
 		}
-		Member requesterMember = memberService.findByEmail(watchAccessRequest.getRequester());
+		Member requesterMember = memberService.findByEmail(requester);
 		if (requesterMember == null || !requesterMember.isActive()
 				|| !requesterMember.getInstallationId().equals(installationId)) {
-			logger.debug("Valid 'Member' entry not found with email : " + watchAccessRequest.getRequester()
-					+ ", returning...");
-			throw new InvalidMemberException(watchAccessRequest.getRequester());
+			logger.debug("Valid 'Member' entry not found with email : " + requester + ", returning...");
+			throw new InvalidMemberException(requester);
 		}
 		Member targetMember = memberService.findByEmail(watchAccessRequest.getTarget());
 		if (targetMember == null || !targetMember.isActive()) {
-			logger.debug("Valid 'Member' entry not found with email : " + watchAccessRequest.getTarget()
-					+ ", returning...");
+			logger.debug(
+					"Valid 'Member' entry not found with email : " + watchAccessRequest.getTarget() + ", returning...");
 			throw new InvalidMemberException(watchAccessRequest.getTarget());
 		}
 

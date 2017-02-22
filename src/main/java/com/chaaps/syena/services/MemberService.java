@@ -93,10 +93,11 @@ public class MemberService {
 	}
 
 	@Transactional
-	public void activateMember(String email) {
+	public void activateMember(String email, String installationId) {
 		logger.debug("Received request to activate member " + email);
 		Member m = memberRepository.findByEmail(email);
 		m.setActive(true);
+		m.setInstallationId(installationId);
 		logger.debug("Member is activated");
 	}
 

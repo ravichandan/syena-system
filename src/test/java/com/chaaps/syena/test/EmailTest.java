@@ -1,6 +1,5 @@
 package com.chaaps.syena.test;
 
-import com.chaaps.syena.web.request.EmailVerifyRequest;
 import com.chaaps.syena.web.request.PinValidationRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +16,7 @@ public class EmailTest {
 		*/
 
 		PinValidationRequest req = new PinValidationRequest();
-		req.setRequester("chan@g.com");
+		//req.setRequester("chan@g.com");
 //		req.setInstallationId("sfd");
 		req.setPin("3424");
 		ObjectMapper mapper = new ObjectMapper();
