@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Created by sitir on 13-02-2017.
  */
@@ -61,9 +63,15 @@ public class GetWatchesResponse implements Serializable {
 		 *
 		 */
 		private static final long serialVersionUID = -8090556785484270675L;
+		@JsonProperty
 		String email;
+		@JsonProperty
 		String name;
+		@JsonProperty
 		boolean enabled;
+
+		public Entry() {
+		}
 
 		Entry(String email, String name, boolean enabled) {
 			this.email = email;

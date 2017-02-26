@@ -1,6 +1,7 @@
 package com.chaaps.syena.repositories;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -27,4 +28,7 @@ public interface MemberRepository extends CrudRepository<Member, Serializable> {
 			@Param("installationId") String installationId);
 
 	public Long countByEmailAndInstallationIdAndActive(String email, String installationId, boolean active);
+
+	@Query("select m.registrationToken from MemberRegistration m")
+	public List<String> findAllRegistrationTokens();
 }

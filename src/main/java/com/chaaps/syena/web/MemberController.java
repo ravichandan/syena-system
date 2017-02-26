@@ -68,6 +68,8 @@ public class MemberController {
 
 	@Autowired
 	JmsTemplate jmsTemplate;
+	
+	
 
 	@GET
 	@Path("test")
