@@ -68,8 +68,6 @@ public class MemberController {
 
 	@Autowired
 	JmsTemplate jmsTemplate;
-	
-	
 
 	@GET
 	@Path("test")
@@ -122,7 +120,7 @@ public class MemberController {
 	public EmailVerifyResponse getOrCreateMember(@HeaderParam(value = Constants.INSTALLATION_ID) String installationId,
 			@QueryParam(Constants.QP_REQUESTER) String requester) {
 
-		logger.debug("In getOrCreateMember() " + requester + ", InstallationId " + installationId);
+		logger.debug("In getOrCreateMember(), received request to '/get-or-create', requester: " + requester);
 		EmailVerifyResponse response = new EmailVerifyResponse();
 		try {
 			{
@@ -180,7 +178,7 @@ public class MemberController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public PinValidationResponse addMember(@HeaderParam(value = Constants.INSTALLATION_ID) String installationId,
 			@QueryParam(Constants.QP_REQUESTER) String requester, PinValidationRequest pinValidationRequest) {
-		logger.debug("In addMember() " + pinValidationRequest + ", installationId " + installationId);
+		logger.debug("In addMember(), received request to '/add', requester: " + requester);
 		PinValidationResponse response = new PinValidationResponse();
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
@@ -195,6 +193,7 @@ public class MemberController {
 				return response;
 			}
 		}
+		logger.debug("Primary validations are successful");
 		try {
 			int result = memberTransactionService.validatePin(requester, installationId, pinValidationRequest.getPin());
 			if (result == PinValidationResponse.SUCCESS) {
@@ -216,7 +215,7 @@ public class MemberController {
 	public TagCodeGenerationResponse generateTagCode(
 			@HeaderParam(value = Constants.INSTALLATION_ID) String installationId,
 			@QueryParam(Constants.QP_REQUESTER) String requester) {
-		logger.debug("In generateTagCode() " + requester + ", installationId " + installationId);
+		logger.debug("In generateTagCode(), received request to '/tag-code', requester: " + requester);
 
 		TagCodeGenerationResponse response = new TagCodeGenerationResponse();
 		if (StringUtils.isBlank(installationId)) {
@@ -230,6 +229,7 @@ public class MemberController {
 			return response;
 
 		}
+		logger.debug("Primary validations are successful");
 		Member member = memberService.findByEmail(requester);
 		if (member == null) {
 			logger.debug("Valid 'Member' entry not found with email : " + requester + ", returning...");
@@ -274,7 +274,7 @@ public class MemberController {
 																										// email
 																										// in
 																										// response
-		logger.info("Received request in tagMemberByCode() to tag, Installation-Id : " + installationId);
+		logger.info("Received request in tagMemberByCode() to tag, requester: " + requester);
 		TagByCodeResponse response = new TagByCodeResponse();
 
 		if (StringUtils.isBlank(installationId)) {
@@ -345,7 +345,7 @@ public class MemberController {
 			@QueryParam(Constants.QP_REQUESTER) String requester) {// TODO
 																	// verify
 																	// again
-		logger.info("Request received to '/tag-code', " + requester);
+		logger.info("Request received to '/tag-code', requester: " + requester);
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
 			return Response.notModified().build();
@@ -395,6 +395,7 @@ public class MemberController {
 			return Response.notModified().entity("Email is invalid.").build();
 		}
 		try {
+			logger.debug("Primary validation successful. Requester: " + locationUpdateRequest.getRequester());
 			Member member = memberService.findByEmail(locationUpdateRequest.getRequester());
 			if (member == null || !member.isActive() || !member.getInstallationId().equals(installationId)) {
 				logger.debug("Valid 'Member' entry not found with email : " + locationUpdateRequest.getRequester()
@@ -418,7 +419,7 @@ public class MemberController {
 			@QueryParam(Constants.QP_TARGET) String targetEmail,
 			@QueryParam(Constants.QP_REQUESTER) String requesterEmail) {
 
-		logger.info("Request received to '/start-watch'," + requesterEmail);
+		logger.info("Request received to '/start-watch', requester: " + requesterEmail);
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
 			throw new InvalidInstallationIdException();
@@ -457,7 +458,7 @@ public class MemberController {
 			@QueryParam(Constants.QP_TARGET) String targetEmail,
 			@QueryParam(Constants.QP_REQUESTER) String requesterEmail) {
 
-		logger.info("Request received to '/stop-watch'," + requesterEmail);
+		logger.info("Request received to '/stop-watch', requester: " + requesterEmail);
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
 			throw new InvalidInstallationIdException();
@@ -495,7 +496,7 @@ public class MemberController {
 	public LocationResponse getLocation(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
 			@QueryParam(Constants.QP_TARGET) String targetEmail,
 			@QueryParam(Constants.QP_REQUESTER) String requesterEmail) {
-		logger.info("Request received to '/get-location'," + requesterEmail);
+		logger.info("Request received to '/get-location', requester: " + requesterEmail);
 		LocationResponse response = new LocationResponse();
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
@@ -509,6 +510,7 @@ public class MemberController {
 			return response;
 		}
 		try {
+			logger.debug("Primary validations are successful.");
 			Member originMember = memberService.findByEmail(requesterEmail);
 			if (originMember == null || !originMember.isActive()
 					|| !originMember.getInstallationId().equals(installationId)) {
@@ -554,7 +556,7 @@ public class MemberController {
 	public Response updateWatchAccess(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
 			@QueryParam(Constants.QP_REQUESTER) String requester, WatchAccessRequest watchAccessRequest) {
 
-		logger.info("Request received to update registration token signature");
+		logger.info("Request received to '/watch-access', requester: " + requester);
 
 		if (StringUtils.isBlank(installationId) || watchAccessRequest == null) {
 			logger.debug("Installation-Id is empty, returning error response");
@@ -596,7 +598,7 @@ public class MemberController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public GetWatchersResponse getWatchers(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
 			@QueryParam(Constants.QP_REQUESTER) String requester) {
-		logger.info("Received request to '/get-watchers', " + requester);
+		logger.info("Received request to '/get-watchers', requester: " + requester);
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
 			throw new InvalidInstallationIdException();
@@ -633,7 +635,7 @@ public class MemberController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateSignature(@HeaderParam(Constants.INSTALLATION_ID) String installationId, String tokenData) {
 
-		logger.info("Request received to update registration token signature");
+		logger.info("Request received to '/update-registration' token signature");
 
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
@@ -645,6 +647,7 @@ public class MemberController {
 		}
 
 		JsonParser parser = new JsonParser();
+		logger.debug("Parsing tokenData");
 		try {
 			JsonObject jo = parser.parse(tokenData).getAsJsonObject();
 			String regToken = jo.get(Constants.REGISTRATION_TOKEN).getAsString();
@@ -665,7 +668,7 @@ public class MemberController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public GetWatchesResponse getWatches(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
 			@QueryParam(Constants.QP_REQUESTER) String requester) {
-		logger.info("Request received to '/get-watches', " + requester);
+		logger.info("Request received to '/get-watches', requester: " + requester);
 
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
@@ -689,7 +692,8 @@ public class MemberController {
 		List<WatchDataObject> watches = watchService.findWatchesByOriginMemberEmail(requester);
 		for (WatchDataObject m : watches) {
 			logger.debug("Adding entry for : " + m.getTargetMemberEmail());
-			response.addEntry(m.getTargetMemberEmail(), m.getWatchName(), m.getTargetAccepted());
+			response.addEntry(m.getTargetMemberEmail(), m.getWatchName(), m.getTargetAccepted(),
+					!(m.getWatchStatus().equals(Constants.WATCH_STATUS_IN_ACTIVE)));
 		}
 
 		logger.debug("Returning response for getWatchers()");

@@ -36,10 +36,10 @@ public class GetWatchesResponse implements Serializable {
 		this.watchEntries = watchMembers;
 	}
 
-	public void addEntry(String email, String name, boolean enabled) {
+	public void addEntry(String email, String name, boolean enabled, boolean watchActive) {
 		if (watchEntries == null)
 			watchEntries = new ArrayList<>();
-		watchEntries.add(new GetWatchesResponse.Entry(email, name, enabled));
+		watchEntries.add(new GetWatchesResponse.Entry(email, name, enabled, watchActive));
 
 	}
 
@@ -69,15 +69,17 @@ public class GetWatchesResponse implements Serializable {
 		String name;
 		@JsonProperty
 		boolean enabled;
+		@JsonProperty
+		boolean watchActive;
 
 		public Entry() {
 		}
 
-		Entry(String email, String name, boolean enabled) {
+		Entry(String email, String name, boolean enabled, boolean watchActive) {
 			this.email = email;
 			this.name = name;
 			this.enabled = enabled;
-
+			this.watchActive = watchActive;
 		}
 
 		@Override
