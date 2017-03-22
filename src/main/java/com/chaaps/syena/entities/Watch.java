@@ -2,6 +2,7 @@ package com.chaaps.syena.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -38,7 +39,7 @@ public class Watch implements Serializable {
 	private boolean targetAccepted;
 	private List<WatchConfiguration> watchConfigurations;
 	private String status;
-	private String watchName;
+	private String nickName;
 	private WatchInstance watchInstance;
 	private Set<WatchMessage> watchMessages;
 
@@ -119,21 +120,23 @@ public class Watch implements Serializable {
 	/**
 	 * @return the watchName
 	 */
-	@Column(name = "WATCH_NAME")
-	public String getWatchName() {
-		return watchName;
+	@Column(name = "NICK_NAME")
+	public String getNickName() {
+		return nickName;
 	}
 
 	/**
 	 * @param watchName
 	 *            the watchName to set
 	 */
-	public void setWatchName(String watchName) {
-		this.watchName = watchName;
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
 	}
 
-	@OneToMany(mappedBy = "watch")
+	@OneToMany(mappedBy = "watch", cascade = CascadeType.ALL)
 	public List<WatchConfiguration> getWatchConfigurations() {
+		if (watchConfigurations == null)
+			watchConfigurations = new ArrayList<>();
 		return this.watchConfigurations;
 	}
 

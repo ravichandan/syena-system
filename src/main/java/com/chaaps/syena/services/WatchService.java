@@ -2,6 +2,9 @@ package com.chaaps.syena.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.DELETE;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,9 @@ public class WatchService {
 
 	@Autowired
 	private WatchService watchService;
+
+	@Autowired
+	private MemberService memberService;
 
 	/**
 	 * @return the watchRepository
@@ -301,4 +307,46 @@ public class WatchService {
 		updateWatchInstance(watchList);
 	}
 
+	@Transactional
+	public void saveWatchDetails(String requester, String target, Map<String, String> watchDetails) {
+		if (watchDetails == null) {
+			logger.debug("Received watchDetails is null");
+			throw new SyenaException("watchDetails is null");
+		}
+		logger.debug("Analysing received data watchDetails");
+		Member originMember = memberService.findByEmail(requester);
+		Member targetMember = memberService.findByEmail(target);
+		Watch watch = findByOriginMemberAndTargetMember(originMember, targetMember);
+		for (String key : watchDetails.keySet()) {
+			logger.debug("Watch details, key : " + key);
+			if (key.equals("nickName")) {
+				watch.setNickName(watchDetails.get(key));
+			} else if (key.equals("refreshInterval")) {
+				WatchConfiguration wc = new WatchConfiguration();
+				wc.setEntry("refreshInterval");
+				wc.setValue(watchDetails.get(key));
+				watch.getWatchConfigurations().add(wc);
+
+			} else if (key.equals("safeDistance")) {
+				WatchConfiguration wc = new WatchConfiguration();
+				wc.setEntry("safeDistance");
+				wc.setValue(watchDetails.get(key));
+				watch.getWatchConfigurations().add(wc);
+			}
+		}
+	}
+
+	@Transactional
+	public void deleteWatch(String requester, String target) {
+		logger.debug("Deleting " + requester + " 's watch for " + target);
+		Member originMember = memberService.findByEmail(requester);
+		Member targetMember = memberService.findByEmail(target);
+		Watch watch = findByOriginMemberAndTargetMember(originMember, targetMember);
+		if (watch == null) {
+			logger.debug("Watch doesn't exist between " + requester + " and " + target);
+			return;
+		}
+		logger.debug("Deleting watch, id: " + watch.getId());
+		watchRepository.delete(watch);
+	}
 }

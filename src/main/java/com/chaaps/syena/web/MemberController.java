@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -31,6 +32,7 @@ import com.chaaps.syena.exceptions.InvalidEmailException;
 import com.chaaps.syena.exceptions.InvalidInstallationIdException;
 import com.chaaps.syena.exceptions.InvalidMemberException;
 import com.chaaps.syena.exceptions.InvalidWatchException;
+import com.chaaps.syena.exceptions.SyenaException;
 import com.chaaps.syena.services.MemberService;
 import com.chaaps.syena.services.MemberTransactionService;
 import com.chaaps.syena.services.WatchService;
@@ -698,5 +700,90 @@ public class MemberController {
 
 		logger.debug("Returning response for getWatchers()");
 		return response;
+	}
+
+	@POST
+	@Path("/watch-details")
+	@Produces(MediaType.APPLICATION_JSON)
+	public void saveWatchDetails(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
+			@QueryParam(Constants.QP_REQUESTER) String requester, @QueryParam(Constants.QP_TARGET) String targetEmail,
+			Map<String, String> watchDetails) {
+		logger.info("Request received to '/watch-details', requester: " + requester + ", target: " + targetEmail);
+
+		if (StringUtils.isBlank(installationId)) {
+			logger.debug("Installation-Id is empty, returning error response");
+			throw new InvalidInstallationIdException();
+		}
+		{
+			StringBuilder validRes1 = ValidationUtils.validateEmail(requester);
+			if (validRes1 != null) {
+				logger.debug("Requester email is invalid, returning error response");
+				throw new InvalidEmailException(validRes1 + " " + requester);
+			}
+			validRes1 = ValidationUtils.validateEmail(targetEmail);
+			if (validRes1 != null) {
+				logger.debug("Target email is invalid, returning error response");
+				throw new InvalidEmailException(validRes1 + " " + targetEmail);
+			}
+		}
+		Long requesterMemberCount = memberService.countActiveMembersByEmailAndInstallationId(requester, installationId);
+		if (requesterMemberCount == null || requesterMemberCount <= 0) {
+			logger.debug("Valid 'Member' entry not found with email : " + requester + ", returning...");
+			throw new InvalidMemberException(requester);
+		}
+		Member targetMember = memberService.findByEmail(targetEmail);
+		if (targetMember == null) {
+			logger.debug("Valid 'Member' entry not found with email : " + targetEmail + ", returning...");
+			throw new InvalidMemberException(targetEmail);
+		}
+
+		if (watchDetails == null) {
+			logger.debug("Received watchDetails is null");
+			throw new SyenaException("watchDetails is null");
+		}
+		watchService.saveWatchDetails(requester, targetEmail, watchDetails);
+
+		logger.debug("Successfully saved watch details");
+
+	}
+
+	@DELETE
+	@Path("/delete-watch")
+	@Produces(MediaType.APPLICATION_JSON)
+	public void deleteWatch(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
+			@QueryParam(Constants.QP_REQUESTER) String requester, @QueryParam(Constants.QP_TARGET) String targetEmail) {
+
+		logger.info("Request received to '/delete-watch', requester: " + requester + ", target: " + targetEmail);
+
+		if (StringUtils.isBlank(installationId)) {
+			logger.debug("Installation-Id is empty, returning error response");
+			throw new InvalidInstallationIdException();
+		}
+		{
+			StringBuilder validRes1 = ValidationUtils.validateEmail(requester);
+			if (validRes1 != null) {
+				logger.debug("Requester email is invalid, returning error response");
+				throw new InvalidEmailException(validRes1 + " " + requester);
+			}
+			validRes1 = ValidationUtils.validateEmail(targetEmail);
+			if (validRes1 != null) {
+				logger.debug("Target email is invalid, returning error response");
+				throw new InvalidEmailException(validRes1 + " " + targetEmail);
+			}
+		}
+		Long requesterMemberCount = memberService.countActiveMembersByEmailAndInstallationId(requester, installationId);
+		if (requesterMemberCount == null || requesterMemberCount <= 0) {
+			logger.debug("Valid 'Member' entry not found with email : " + requester + ", returning...");
+			throw new InvalidMemberException(requester);
+		}
+		Member targetMember = memberService.findByEmail(targetEmail);
+		if (targetMember == null) {
+			logger.debug("Valid 'Member' entry not found with email : " + targetEmail + ", returning...");
+			throw new InvalidMemberException(targetEmail);
+		}
+
+		watchService.deleteWatch(requester, targetEmail);
+		logger.debug("Successfully deleted watch");
+
 	}
 }

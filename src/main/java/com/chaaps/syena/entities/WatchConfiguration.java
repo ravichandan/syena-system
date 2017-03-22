@@ -119,4 +119,17 @@ public class WatchConfiguration implements Serializable {
 		this.watch = watch;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof WatchConfiguration) {
+			return false;
+		}
+		WatchConfiguration that = (WatchConfiguration) obj;
+		return this.entry.equals(that.entry) && this.value.equals(that.value);
+	}
+
+	@Override
+	public int hashCode() {
+		return (entry + value).hashCode();
+	}
 }
