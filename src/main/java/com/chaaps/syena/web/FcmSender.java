@@ -35,7 +35,7 @@ public class FcmSender {
 	static String regToken = "d2JkI9R32Kk:APA91bHyLA4hPJnk-WI1ZxtTXR3HUq8IA6CwYtE9sS_KDpJeOU_voEMxykSzs30Cr12cTaCb6zsSjtHPDaPOJWC9crwg4SRsoBsoB321w5oZKvYY_xEOWW2UVbiU3MADOzQK0NDJzO1H";
 
 	public FcmSender() {
-		startIpUpdateTask();
+		//startIpUpdateTask();
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class FcmSender {
 
 			@Override
 			public void run() {
-				while (true) {
+				//while (true) {
 					logger.debug("FCMSender: looping...");
 					URL whatismyip;
 					try {
@@ -75,7 +75,7 @@ public class FcmSender {
 					}
 
 				}
-			}
+			//}
 		});
 		t.start();
 	}
