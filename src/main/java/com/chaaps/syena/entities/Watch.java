@@ -118,7 +118,7 @@ public class Watch implements Serializable {
 	// uni-directional many-to-one association to WatchConfiguration
 
 	/**
-	 * @return the watchName
+	 * @return the nickName
 	 */
 	@Column(name = "NICK_NAME")
 	public String getNickName() {
@@ -126,8 +126,8 @@ public class Watch implements Serializable {
 	}
 
 	/**
-	 * @param watchName
-	 *            the watchName to set
+	 * @param nickName
+	 *            the nickName to set
 	 */
 	public void setNickName(String nickName) {
 		this.nickName = nickName;

@@ -623,7 +623,7 @@ public class MemberController {
 		List<WatcherDataObject> watchers = watchService.findWatchersByTargetMemberEmail(requester);
 		for (WatcherDataObject m : watchers) {
 			logger.debug("Adding entry for : " + m.getOriginMemberEmail());
-			response.addEntry(m.getOriginMemberEmail(), m.getWatchName(), m.getTargetAccepted());
+			response.addEntry(m.getOriginMemberEmail(), m.getNickName(), m.getTargetAccepted());
 		}
 
 		logger.debug("Returning response for getWatchers()");
@@ -694,7 +694,7 @@ public class MemberController {
 		List<WatchDataObject> watches = watchService.findWatchesByOriginMemberEmail(requester);
 		for (WatchDataObject m : watches) {
 			logger.debug("Adding entry for : " + m.getTargetMemberEmail());
-			response.addEntry(m.getTargetMemberEmail(), m.getWatchName(), m.getTargetAccepted(),
+			response.addEntry(m.getTargetMemberEmail(), m.getNickName(), m.getTargetAccepted(),
 					!(m.getWatchStatus().equals(Constants.WATCH_STATUS_IN_ACTIVE)));
 		}
 

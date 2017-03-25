@@ -4,7 +4,7 @@ public interface WatcherDataObject {
 
 	boolean getTargetAccepted();
 
-	String getWatchName();
+	String getNickName();
 
 	// @Value("#{target.originMember.email}")
 	String getOriginMemberEmail();

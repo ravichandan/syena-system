@@ -6,7 +6,7 @@ public interface WatchDataObject {
 	
 	String getWatchStatus();
 
-	String getWatchName();
+	String getNickName();
 
 	// @Value("#{target.originMember.email}")
 	String getTargetMemberEmail();

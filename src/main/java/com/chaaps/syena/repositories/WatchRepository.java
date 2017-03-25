@@ -29,10 +29,10 @@ public interface WatchRepository extends CrudRepository<Watch, Serializable> {
 
 	public List<Watch> findByTargetMemberAndStatusNot(Member targetMember, String status);
 
-	@Query("select om.email as originMemberEmail,w.watchName as watchName,w.targetAccepted as targetAccepted from Watch w left join w.originMember om left join w.targetMember tm where tm.email = :email")
+	@Query("select om.email as originMemberEmail,w.nickName as nickName,w.targetAccepted as targetAccepted from Watch w left join w.originMember om left join w.targetMember tm where tm.email = :email")
 	public List<WatcherDataObject> findWatchersByTargetMemberEmail(@Param("email") String email);
 
-	@Query("select tm.email as targetMemberEmail,w.status as watchStatus, w.watchName as watchName,w.targetAccepted as targetAccepted from Watch w left join w.originMember om left join w.targetMember tm where om.email = :email")
+	@Query("select tm.email as targetMemberEmail,w.status as watchStatus, w.nickName as nickName,w.targetAccepted as targetAccepted from Watch w left join w.originMember om left join w.targetMember tm where om.email = :email")
 	public List<WatchDataObject> findWatchesByOriginMemberEmail(@Param("email") String email);
 
 }
