@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.chaaps.syena.entities.Member;
 import com.chaaps.syena.entities.MemberTransaction;
@@ -832,6 +833,7 @@ public class MemberController {
 	@Path("/get-profile-pic")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces({ "image/png", "image/jpg" })
+	@Transactional
 	public Response getProfilePic(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
 			@QueryParam(Constants.QP_REQUESTER) String requester, @QueryParam(Constants.QP_TARGET) String target) {
 
