@@ -1,5 +1,8 @@
 package com.chaaps.syena.services;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.chaaps.syena.entities.Member;
+import com.chaaps.syena.entities.MemberImage;
 import com.chaaps.syena.entities.MemberRegistration;
 import com.chaaps.syena.entities.virtual.MemberIdEmailInstallationIdDataObject;
+import com.chaaps.syena.repositories.MemberImageRepository;
 import com.chaaps.syena.repositories.MemberRepository;
 
 @Service
@@ -17,6 +22,12 @@ public class MemberService {
 
 	@Autowired
 	private MemberRepository memberRepository;
+
+	@Autowired
+	private MemberImageRepository memberImageRepository;
+	
+	@PersistenceContext
+	EntityManager entityManager;
 
 	/**
 	 * @return the memberRepository
@@ -114,5 +125,23 @@ public class MemberService {
 		mr.setRegistrationToken(regToken);
 		m.setMemberRegistration(mr);
 		logger.debug("Registration token is successfully updated");
+	}
+
+	@Transactional
+	public void saveMemberImage(String email, String image) {
+		logger.debug("Received request to save member image for email: " + email);
+		Member m = memberRepository.findByEmail(email);
+		MemberImage mi = new MemberImage();
+		mi.setImage(image.getBytes());
+		mi.setProfilePic(true);
+		entityManager.persist(mi);
+		mi = memberImageRepository.save(mi);
+		entityManager.flush();
+		
+		logger.debug("Saved successfully, MemberImage id: " + mi.getId());
+		mi = memberImageRepository.findOne(mi.getId());
+		logger.debug("Saved data " + mi.getCreatedDate());
+		m.setMemberImage(mi);
+		// memberRepository.save(m);
 	}
 }

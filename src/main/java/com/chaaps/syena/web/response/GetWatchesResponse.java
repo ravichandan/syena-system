@@ -71,6 +71,8 @@ public class GetWatchesResponse implements Serializable {
 		boolean enabled;
 		@JsonProperty
 		boolean watchActive;
+		// @JsonProperty
+		// byte[] profilePic;
 
 		public Entry() {
 		}
@@ -80,6 +82,7 @@ public class GetWatchesResponse implements Serializable {
 			this.name = name;
 			this.enabled = enabled;
 			this.watchActive = watchActive;
+			// this.profilePic = profilePic;
 		}
 
 		@Override

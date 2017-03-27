@@ -10,4 +10,7 @@ public interface WatchDataObject {
 
 	// @Value("#{target.originMember.email}")
 	String getTargetMemberEmail();
+	
+	//@Value("#{target.memberImage.image}")
+	//byte[] getProfilePic();
 }

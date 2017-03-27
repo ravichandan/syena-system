@@ -12,6 +12,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -42,6 +43,7 @@ public class Member implements Serializable {
 	private Timestamp updatedDate;
 	private Set<Watch> watches;
 	private MemberRegistration memberRegistration;
+	private MemberImage memberImage;
 	// private MemberTransaction memberTransaction;
 
 	public Member() {
@@ -196,6 +198,16 @@ public class Member implements Serializable {
 		this.memberRegistration = memberRegistration;
 	}
 
+	@OneToOne  (cascade = CascadeType.ALL, fetch = FetchType.LAZY,
+				 orphanRemoval = true)
+	@JoinColumn(name = "MEMBER_IMAGE_ID")
+	public MemberImage getMemberImage() {
+		return memberImage;
+	}
+
+	public void setMemberImage(MemberImage memberImage) {
+		this.memberImage = memberImage;
+	}
 	/**
 	 * @return the memberTransaction
 	 */
