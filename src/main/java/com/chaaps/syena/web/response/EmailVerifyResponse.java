@@ -1,5 +1,7 @@
 package com.chaaps.syena.web.response;
 
+import com.chaaps.syena.entities.virtual.MemberViewObject;
+
 /**
  * Created by sitir on 02-02-2017.
  */
@@ -25,6 +27,8 @@ public class EmailVerifyResponse {
 	private boolean emailSent;
 
 	private Error error;
+
+	private MemberViewObject memberViewObject;
 
 	public String getEmail() {
 		return email;
@@ -85,6 +89,21 @@ public class EmailVerifyResponse {
 	 */
 	public void setEmailSent(boolean emailSent) {
 		this.emailSent = emailSent;
+	}
+
+	/**
+	 * @return the memberViewObject
+	 */
+	public MemberViewObject getMemberViewObject() {
+		return memberViewObject;
+	}
+
+	/**
+	 * @param memberViewObject
+	 *            the memberViewObject to set
+	 */
+	public void setMemberViewObject(MemberViewObject memberViewObject) {
+		this.memberViewObject = memberViewObject;
 	}
 
 	public static class Error {

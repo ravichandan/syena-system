@@ -13,6 +13,7 @@ import com.chaaps.syena.entities.Member;
 import com.chaaps.syena.entities.MemberImage;
 import com.chaaps.syena.entities.MemberRegistration;
 import com.chaaps.syena.entities.virtual.MemberIdEmailInstallationIdDataObject;
+import com.chaaps.syena.entities.virtual.MemberViewObject;
 import com.chaaps.syena.repositories.MemberImageRepository;
 import com.chaaps.syena.repositories.MemberRepository;
 
@@ -25,7 +26,7 @@ public class MemberService {
 
 	@Autowired
 	private MemberImageRepository memberImageRepository;
-	
+
 	@PersistenceContext
 	EntityManager entityManager;
 
@@ -131,17 +132,69 @@ public class MemberService {
 	public void saveMemberImage(String email, String image) {
 		logger.debug("Received request to save member image for email: " + email);
 		Member m = memberRepository.findByEmail(email);
+		if (m == null) {
+			logger.debug("Member not found with email: " + email);
+			return;
+		}
 		MemberImage mi = new MemberImage();
 		mi.setImage(image.getBytes());
 		mi.setProfilePic(true);
 		entityManager.persist(mi);
 		mi = memberImageRepository.save(mi);
 		entityManager.flush();
-		
+
 		logger.debug("Saved successfully, MemberImage id: " + mi.getId());
 		mi = memberImageRepository.findOne(mi.getId());
 		logger.debug("Saved data " + mi.getCreatedDate());
 		m.setMemberImage(mi);
 		// memberRepository.save(m);
+	}
+
+	@Transactional
+	public MemberViewObject prepareMemberViewObject(String requester) {
+		Member member = memberRepository.findByEmail(requester);
+
+		MemberViewObject mvo = new MemberViewObject();
+		mvo.setDisplayName(member.getDisplayName());
+		if (member.getMemberImage() != null)
+			mvo.setImage(member.getMemberImage().getImage());
+		mvo.setLatitude(member.getLatitude());
+		mvo.setLongitude(member.getLongitude());
+		return mvo;
+
+	}
+	
+	@Transactional
+	public void updateMember(String email, MemberViewObject memberViewObject) {
+		logger.debug("Received request to update member profile, requester: " + email);
+
+		Member member = memberRepository.findByEmail(email);
+		if (!StringUtils.isBlank(memberViewObject.getDisplayName())) {
+			logger.debug("Setting displayName: "+memberViewObject.getDisplayName());
+			member.setDisplayName(memberViewObject.getDisplayName());
+		}
+		if (memberViewObject.getImage() != null && memberViewObject.getImage().length != 0) {
+			logger.debug("Setting image: "+memberViewObject.getImage());
+			MemberImage mi = new MemberImage();
+			mi.setImage(memberViewObject.getImage());
+			mi.setProfilePic(true);
+			entityManager.persist(mi);
+			mi = memberImageRepository.save(mi);
+			entityManager.flush();
+
+			logger.debug("Saved successfully, MemberImage id: " + mi.getId());
+			mi = memberImageRepository.findOne(mi.getId());
+			logger.debug("Saved data " + mi.getCreatedDate());
+			member.setMemberImage(mi);
+		}
+		if (memberViewObject.getLatitude()!=0) {
+			logger.debug("Setting Latitude: "+memberViewObject.getLatitude());
+			member.setLatitude(memberViewObject.getLatitude());
+		}
+		if (memberViewObject.getLongitude()!=0) {
+			logger.debug("Setting Longitude: "+memberViewObject.getLongitude());
+			member.setLongitude(memberViewObject.getLongitude());
+		}
+
 	}
 }

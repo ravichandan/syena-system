@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.chaaps.syena.entities.Member;
 import com.chaaps.syena.entities.MemberTransaction;
 import com.chaaps.syena.entities.Watch;
+import com.chaaps.syena.entities.virtual.MemberViewObject;
 import com.chaaps.syena.entities.virtual.WatchDataObject;
 import com.chaaps.syena.entities.virtual.WatcherDataObject;
 import com.chaaps.syena.exceptions.InvalidEmailException;
@@ -158,6 +159,8 @@ public class MemberController {
 			if (member.getInstallationId().equals(installationId)) {
 				logger.debug("'Installation-Id' matches. Returning success response");
 				response.setStatus(EmailVerifyResponse.SUCCESS);
+				MemberViewObject mvo = memberService.prepareMemberViewObject(requester);
+				response.setMemberViewObject(mvo);
 			} else {
 				logger.debug("'Installation-Id' matches. Probably user is logging into a new device");
 
@@ -204,6 +207,8 @@ public class MemberController {
 			int result = memberTransactionService.validatePin(requester, installationId, pinValidationRequest.getPin());
 			if (result == PinValidationResponse.SUCCESS) {
 				memberService.activateMember(requester, installationId);
+				MemberViewObject mvo = memberService.prepareMemberViewObject(requester);
+				response.setMemberViewObject(mvo);
 			}
 			response.setStatus(result);
 		} catch (Exception e) {
@@ -872,6 +877,38 @@ public class MemberController {
 		logger.debug("Successfully added member image, returning success response for '/get-profile-pic', requester: "
 				+ requester);
 		return Response.ok(targetMember.getMemberImage().getImage()).build();
+
+	}
+
+	@POST
+	@Path("/save-profile")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public void saveProfile(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
+			@QueryParam(Constants.QP_REQUESTER) String requester, MemberViewObject memberViewObject) {
+
+		logger.info("Request received to '/save-profile', requester: " + requester);
+
+		if (StringUtils.isBlank(installationId)) {
+			logger.debug("Installation-Id is empty, returning error response");
+			throw new InvalidInstallationIdException();
+		}
+		{
+			StringBuilder validRes1 = ValidationUtils.validateEmail(requester);
+			if (validRes1 != null) {
+				logger.debug("Requester email is invalid, returning error response");
+				throw new InvalidEmailException(validRes1 + " " + requester);
+			}
+
+		}
+		Long requesterMemberCount = memberService.countActiveMembersByEmailAndInstallationId(requester, installationId);
+		if (requesterMemberCount == null || requesterMemberCount <= 0) {
+			logger.debug("Valid 'Member' entry not found with email : " + requester + ", returning...");
+			throw new InvalidMemberException(requester);
+		}
+		memberService.updateMember(requester, memberViewObject);
+
+		logger.debug("Successfully added member image, returning success response for '/upload-pic', requester: "
+				+ requester);
 
 	}
 }

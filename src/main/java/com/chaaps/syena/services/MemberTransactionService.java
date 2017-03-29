@@ -163,7 +163,8 @@ public class MemberTransactionService {
 		}
 		logger.info("Received Tag Code generation request for member : " + member.getId());
 		try {
-			MemberTransaction mt = memberTransactionRepository.findByMember(member);
+			MemberTransaction mt = memberTransactionRepository.findByMemberAndTxnInstallationId(member,
+					member.getInstallationId());
 			if (mt != null) {
 				logger.debug("Member entry found in table MemberTxn. Resetting TagCode ...");
 				mt.setTagCode(tagCode);

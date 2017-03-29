@@ -1,5 +1,7 @@
 package com.chaaps.syena.web.response;
 
+import com.chaaps.syena.entities.virtual.MemberViewObject;
+
 /**
  * Created by sitir on 02-02-2017.
  */
@@ -15,6 +17,8 @@ public class PinValidationResponse {
 
 	private int status;
 
+	private MemberViewObject memberViewObject;
+
 	/**
 	 * @return the status
 	 */
@@ -28,5 +32,20 @@ public class PinValidationResponse {
 	 */
 	public void setStatus(int status) {
 		this.status = status;
+	}
+
+	/**
+	 * @return the memberViewObject
+	 */
+	public MemberViewObject getMemberViewObject() {
+		return memberViewObject;
+	}
+
+	/**
+	 * @param memberViewObject
+	 *            the memberViewObject to set
+	 */
+	public void setMemberViewObject(MemberViewObject memberViewObject) {
+		this.memberViewObject = memberViewObject;
 	}
 }
