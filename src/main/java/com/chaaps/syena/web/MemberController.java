@@ -635,7 +635,8 @@ public class MemberController {
 		List<WatcherDataObject> watchers = watchService.findWatchersByTargetMemberEmail(requester);
 		for (WatcherDataObject m : watchers) {
 			logger.debug("Adding entry for : " + m.getOriginMemberEmail());
-			response.addEntry(m.getOriginMemberEmail(), m.getNickName(), m.getTargetAccepted());
+			response.addEntry(m.getOriginMemberEmail(), m.getNickName(), m.getTargetAccepted(), m.getStatus(),
+					m.getUpdatedDate());
 		}
 
 		logger.debug("Returning response for '/getWatchers', requester: " + requester);
