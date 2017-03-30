@@ -28,10 +28,11 @@ public class GetWatchersResponse implements Serializable {
 		this.watchers = watchers;
 	}
 
-	public void addEntry(String email, String name, boolean enabled, String status, Date watchingSince) {
+	public void addEntry(String email, String name, boolean enabled, String status, Date watchingSince,
+			byte[] profileImage) {
 		if (watchers == null)
 			watchers = new ArrayList<>();
-		watchers.add(new Entry(email, name, enabled, status, watchingSince));
+		watchers.add(new Entry(email, name, enabled, status, watchingSince, profileImage));
 	}
 
 	static class Entry implements Serializable {
@@ -44,13 +45,15 @@ public class GetWatchersResponse implements Serializable {
 		boolean enabled;
 		String status;
 		Date watchingSince;
+		byte[] profileImage;
 
-		Entry(String email, String name, boolean enabled, String status, Date watchingSince) {
+		Entry(String email, String name, boolean enabled, String status, Date watchingSince, byte[] profileImage) {
 			this.email = email;
 			this.name = name;
 			this.enabled = enabled;
 			this.status = status;
 			this.watchingSince = watchingSince;
+			this.profileImage = profileImage;
 		}
 
 		/**
@@ -111,6 +114,36 @@ public class GetWatchersResponse implements Serializable {
 		 */
 		public void setWatchingSince(Date watchingSince) {
 			this.watchingSince = watchingSince;
+		}
+
+		/**
+		 * @return the status
+		 */
+		public String getStatus() {
+			return status;
+		}
+
+		/**
+		 * @param status
+		 *            the status to set
+		 */
+		public void setStatus(String status) {
+			this.status = status;
+		}
+
+		/**
+		 * @return the profileImage
+		 */
+		public byte[] getProfileImage() {
+			return profileImage;
+		}
+
+		/**
+		 * @param profileImage
+		 *            the profileImage to set
+		 */
+		public void setProfileImage(byte[] profileImage) {
+			this.profileImage = profileImage;
 		}
 
 		@Override

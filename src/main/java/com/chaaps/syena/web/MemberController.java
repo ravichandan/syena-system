@@ -26,6 +26,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.chaaps.syena.entities.Member;
+import com.chaaps.syena.entities.MemberImage;
 import com.chaaps.syena.entities.MemberTransaction;
 import com.chaaps.syena.entities.Watch;
 import com.chaaps.syena.entities.virtual.MemberViewObject;
@@ -610,6 +611,7 @@ public class MemberController {
 	@GET
 	@Path("/get-watchers")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
 	public GetWatchersResponse getWatchers(@HeaderParam(Constants.INSTALLATION_ID) String installationId,
 			@QueryParam(Constants.QP_REQUESTER) String requester) {
 		logger.info("Received request to '/get-watchers', requester: " + requester);
@@ -635,8 +637,15 @@ public class MemberController {
 		List<WatcherDataObject> watchers = watchService.findWatchersByTargetMemberEmail(requester);
 		for (WatcherDataObject m : watchers) {
 			logger.debug("Adding entry for : " + m.getOriginMemberEmail());
-			response.addEntry(m.getOriginMemberEmail(), m.getNickName(), m.getTargetAccepted(), m.getStatus(),
-					m.getUpdatedDate());
+			MemberImage originMemberImage = memberService.findByEmail(m.getOriginMemberEmail()).getMemberImage();
+			if (originMemberImage == null || originMemberImage.getImage() == null
+					|| originMemberImage.getImage().length == 0) {
+				response.addEntry(m.getOriginMemberEmail(), m.getNickName(), m.getTargetAccepted(), m.getStatus(),
+						m.getUpdatedDate(), null);
+			} else {
+				response.addEntry(m.getOriginMemberEmail(), m.getNickName(), m.getTargetAccepted(), m.getStatus(),
+						m.getUpdatedDate(), originMemberImage.getImage());
+			}
 		}
 
 		logger.debug("Returning response for '/getWatchers', requester: " + requester);
