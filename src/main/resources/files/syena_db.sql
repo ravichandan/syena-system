@@ -1,6 +1,6 @@
-drop database syena;
-create database syena;
-USE syena;
+#drop database syena;
+#create database syena;
+#USE syena;
 
 drop table MEMBER_REGISTRATION;
 create table MEMBER  ( ID BIGINT NOT NULL AUTO_INCREMENT, 
