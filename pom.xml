@@ -261,7 +261,7 @@
 	<properties>
 		<spring.version>4.3.5.RELEASE</spring.version>
 		<security.version>4.2.1.RELEASE</security.version>
-		<jdk.version>1.8</jdk.version>
+		<jdk.version>1.7</jdk.version>
 		<hibernate.version>5.2.6.Final</hibernate.version>
 		<org.aspectj-version>1.7.4</org.aspectj-version>
 	</properties>
