@@ -228,9 +228,18 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>mvn repo</id>
+			<name>Maven Repository</name>
+			<url>https://repo.maven.apache.org/maven2/</url>
+			<layout>default</layout>
+		</repository>
+	</distributionManagement>
 	<build>
 		<finalName>syena-system</finalName>
-
+		<outputDirectory>target/${project.artifactId}/WEB-INF/classes</outputDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -247,6 +256,15 @@
 				<version>3.0.0</version>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<archiveClasses>true</archiveClasses>
+					<webResources>
+						<!-- in order to interpolate version from pom into appengine-web.xml -->
+						<resource>
+							<directory>${basedir}/src/main/webapp/WEB-INF</directory>
+							<filtering>true</filtering>
+							<targetPath>WEB-INF</targetPath>
+						</resource>
+					</webResources>
 				</configuration>
 			</plugin>
 			<plugin>
