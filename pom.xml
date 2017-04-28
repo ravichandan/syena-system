@@ -232,7 +232,7 @@
 		<repository>
 			<id>bintray-syena-syena</id>
 			<name>syena-syena</name>
-			<url>https://api.bintray.com/maven/syena/syena/com/;publish=1</url>
+			<url>https://dl.bintray.com/syena/syena/com;publish=1</url>
 		</repository>
 	</distributionManagement>
 	<build>
