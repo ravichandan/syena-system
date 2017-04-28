@@ -76,7 +76,7 @@ public class LocationUpdateComponent {
 	}
 
 	/**
-	 * Creates and returns a {@link java.lang.String} from t’s stacktrace
+	 * Creates and returns a {@link java.lang.String} from t's stacktrace
 	 * 
 	 * @param t
 	 *            Throwable whose stack trace is required
