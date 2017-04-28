@@ -230,11 +230,9 @@
 	</dependencies>
 	<distributionManagement>
 		<repository>
-			<uniqueVersion>false</uniqueVersion>
-			<id>syena repo</id>
-			<name>Maven Repository</name>
-			<url>https://dl.bintray.com/syena/syena</url>
-			<layout>default</layout>
+			<id>bintray-syena-syena</id>
+			<name>syena-syena</name>
+			<url>https://api.bintray.com/maven/syena/syena/[PACKAGE_NAME]/;publish=1</url>
 		</repository>
 	</distributionManagement>
 	<build>
