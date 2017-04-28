@@ -1,39 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<settings xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'
-          xmlns='http://maven.apache.org/SETTINGS/1.0.0' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
-    <servers>
-        <server>
-            <id>bintray-syena-syena</id>
-            <username>ravichandan</username>
-            <password>5576f2dbeec07b3db66c499fdd9f4ce130f73602</password>
-        </server>
-    </servers>
-    <profiles>
-        <profile>
-            <repositories>
-                <repository>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                    <id>central</id>
-                    <name>bintray</name>
-                    <url>http://jcenter.bintray.com</url>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                    <id>central</id>
-                    <name>bintray-plugins</name>
-                    <url>http://jcenter.bintray.com</url>
-                </pluginRepository>
-            </pluginRepositories>
-            <id>bintray</id>
-        </profile>
-    </profiles>
-    <activeProfiles>
-        <activeProfile>bintray</activeProfile>
-    </activeProfiles>
+<settings
+	xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'
+	xmlns='http://maven.apache.org/SETTINGS/1.0.0' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
+	<localRepository>${user.home}/.m2/repository</localRepository>
+
+	<!-- <servers> -->
+	<!-- <server> -->
+	<!-- <id>bintray-syena-syena</id> -->
+	<!-- <username>ravichandan</username> -->
+	<!-- <password>5576f2dbeec07b3db66c499fdd9f4ce130f73602</password> -->
+	<!-- </server> -->
+	<!-- </servers> -->
+	<!-- <profiles> -->
+	<!-- <profile> -->
+	<!-- <repositories> -->
+	<!-- <repository> -->
+	<!-- <snapshots> -->
+	<!-- <enabled>false</enabled> -->
+	<!-- </snapshots> -->
+	<!-- <id>central</id> -->
+	<!-- <name>bintray</name> -->
+	<!-- <url>http://jcenter.bintray.com</url> -->
+	<!-- </repository> -->
+	<!-- </repositories> -->
+	<!-- <pluginRepositories> -->
+	<!-- <pluginRepository> -->
+	<!-- <snapshots> -->
+	<!-- <enabled>false</enabled> -->
+	<!-- </snapshots> -->
+	<!-- <id>central</id> -->
+	<!-- <name>bintray-plugins</name> -->
+	<!-- <url>http://jcenter.bintray.com</url> -->
+	<!-- </pluginRepository> -->
+	<!-- </pluginRepositories> -->
+	<!-- <id>bintray</id> -->
+	<!-- </profile> -->
+	<!-- </profiles> -->
+	<!-- <activeProfiles> -->
+	<!-- <activeProfile>bintray</activeProfile> -->
+	<!-- </activeProfiles> -->
 </settings>
