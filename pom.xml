@@ -232,7 +232,7 @@
 		<repository>
 			<id>bintray-syena-syena</id>
 			<name>syena-syena</name>
-			<url>file://home/chandan_ravi1987/.m2/repository</url>
+			<url>file://${user.home}/.m2/repository</url>
 		</repository>
 	</distributionManagement>
 	<build>
