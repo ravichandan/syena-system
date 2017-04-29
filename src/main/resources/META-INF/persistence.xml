@@ -2,14 +2,22 @@
 <persistence version="2.1"
 	xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<!-- <persistence-unit name="syena"> <class>com.chaaps.syena.entities.Member</class> 
+		<class>com.chaaps.syena.entities.Watch</class> <class>com.chaaps.syena.entities.MemberRegistration</class> 
+		<class>com.chaaps.syena.entities.MemberTransaction</class> <class>com.chaaps.syena.entities.WatchHistory</class> 
+		<class>com.chaaps.syena.entities.WatchInstance</class> <class>com.chaaps.syena.entities.WatchMessage</class> 
+		<class>com.chaaps.syena.entities.WatchConfiguration</class> </persistence-unit> -->
 	<persistence-unit name="syena">
-		<class>com.chaaps.syena.entities.Member</class>
-		<class>com.chaaps.syena.entities.Watch</class>
-		<class>com.chaaps.syena.entities.MemberRegistration</class>
-		<class>com.chaaps.syena.entities.MemberTransaction</class>
-		<class>com.chaaps.syena.entities.WatchHistory</class>
-		<class>com.chaaps.syena.entities.WatchInstance</class>
-		<class>com.chaaps.syena.entities.WatchMessage</class>
-		<class>com.chaaps.syena.entities.WatchConfiguration</class>
+
+		<provider>org.datanucleus.api.jpa.PersistenceProviderImpl</provider>
+		<exclude-unlisted-classes>false</exclude-unlisted-classes>
+		<properties>
+			<property name="hibernate.archive.autodetection" value="class, hbm" />
+			<property name="datanucleus.NontransactionalRead" value="true" />
+			<property name="datanucleus.NontransactionalWrite" value="true" />
+			<property name="datanucleus.ConnectionURL" value="appengine" />
+			<property name="datanucleus.singletonEMFForName" value="true" />
+		</properties>
+
 	</persistence-unit>
 </persistence>

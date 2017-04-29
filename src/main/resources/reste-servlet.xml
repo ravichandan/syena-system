@@ -29,7 +29,7 @@
 	</bean>
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-		<property name="dataSource" ref="dataSource"></property>
+		<!-- <property name="dataSource" ref="dataSource"></property> -->
 		<property name="persistenceUnitName" value="syena"></property>
 		<property name="packagesToScan" value="com.chaaps.syena.entities"></property>
 		<property name="jpaVendorAdapter">
@@ -52,7 +52,7 @@
 			</value>
 		</property>
 	</bean>
-	<bean id="dataSource"
+	<bean id="dataSource12"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="username" value="root"></property>
 		<property name="password" value="admin"></property>
@@ -85,10 +85,9 @@
 		class="org.springframework.jms.config.DefaultJmsListenerContainerFactory">
 		<property name="connectionFactory" ref="activeConnFactory"></property>
 	</bean>
-	<!-- <bean id="jmsConnFactory"
-		class="org.springframework.jms.connection.CachingConnectionFactory">
-		<property name="targetConnectionFactory" ref="activeConnFactory"></property>
-	</bean> -->
+	<!-- <bean id="jmsConnFactory" class="org.springframework.jms.connection.CachingConnectionFactory"> 
+		<property name="targetConnectionFactory" ref="activeConnFactory"></property> 
+		</bean> -->
 	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
 		<property name="connectionFactory" ref="activeConnFactory"></property>
 		<property name="defaultDestinationName" value="location_update_queue"></property>
