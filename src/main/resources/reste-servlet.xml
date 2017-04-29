@@ -58,7 +58,7 @@
 <!-- 		<property name="password" value="admin@1"></property> -->
 		<property name="driverClassName" value="com.mysql.jdbc.GoogleDriver"></property>
 		<property name="url"
-			value="jdbc:mysql://google/syena_db?cloudSqlInstance=syena-system:asia-east1:syena-db&amp;socketFactory=com.google.cloud.sql.mysql.SocketFactory&amp;useSSL=false"></property>
+			value="jdbc:google:mysql://syena-system:asia-east1:syena-db/syena_db?cloudSqlInstance=syena-system:asia-east1:syena-db&amp;socketFactory=com.google.cloud.sql.mysql.SocketFactory&amp;useSSL=false"></property>
 	</bean>
 	<!-- hibernate.cache.use_second_level_cache = false hibernate.cache.region.factory_class 
 		= org.hibernate.cache.ehcache.EhCacheRegionFactory hibernate.cache.use_query_cache 
