@@ -315,7 +315,7 @@
 			<plugin>
 				<groupId>org.datanucleus</groupId>
 				<artifactId>datanucleus-maven-plugin</artifactId>
-				<version>4.0.5</version>
+				<version>4.0.0-m3</version>
 				<configuration>
 					<api>JPA</api>
 					<persistenceUnitName>syena</persistenceUnitName>
