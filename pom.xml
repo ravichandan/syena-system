@@ -295,7 +295,7 @@
 			<plugin>
 				<groupId>org.datanucleus</groupId>
 				<artifactId>maven-datanucleus-plugin</artifactId>
-				<version>3.2.0-m1</version>
+				<version>2.1.1</version>
 				<configuration>
 					<api>JDO</api>
 					<props>${basedir}/datanucleus.properties</props>
