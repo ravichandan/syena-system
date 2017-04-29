@@ -237,13 +237,13 @@
 		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-core</artifactId>
-			<version>5.0.2</version>
+			<version>4.0.0-release</version>
 
 		</dependency>
 		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-api-jpa</artifactId>
-			<version>5.0.2</version>
+			<version>4.0.0-release</version>
 
 		</dependency>
 <!-- 		<dependency> -->
