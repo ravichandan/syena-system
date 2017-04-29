@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
 import com.chaaps.syena.entities.Member;
@@ -31,7 +33,40 @@ public class LocationUpdateComponent {
 	@Autowired
 	FcmSender fcmSender;
 
-	@JmsListener(destination = "location_update_queue", concurrency = "1")
+	private BlockingQueue<LocationUpdateRequest> queue = new LinkedBlockingQueue<LocationUpdateRequest>();
+
+	private boolean runConsumer = false;
+	Thread consumerThread;
+
+	public void addRequest(LocationUpdateRequest locationUpdateRequest) throws InterruptedException {
+		if (queue.size() > 0 && (consumerThread == null || !consumerThread.isAlive())) {
+			consumerThread = new Thread(new LocationConsumer());
+			runConsumer = true;
+			consumerThread.start();
+		}
+		queue.put(locationUpdateRequest);
+
+	}
+
+	class LocationConsumer implements Runnable {
+
+		@Override
+		public void run() {
+			while (runConsumer) {
+				try {
+					receiveMessage(queue.take());
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (queue.size() == 0)
+					runConsumer = false;
+			}
+		}
+
+	}
+
+	// @JmsListener(destination = "location_update_queue", concurrency = "1")
 	public void receiveMessage(LocationUpdateRequest locationUpdateRequest) {
 		logger.info("JmsMessage received to update member's location : " + locationUpdateRequest);
 

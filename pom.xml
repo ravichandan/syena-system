@@ -34,11 +34,11 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.activemq/activemq-broker -->
 		<!-- <dependency> <groupId>org.apache.activemq</groupId> <artifactId>activemq-broker</artifactId> 
 			<version>5.14.3</version> </dependency> -->
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-core</artifactId>
-			<version>5.7.0</version>
-		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.activemq</groupId> -->
+		<!-- <artifactId>activemq-core</artifactId> -->
+		<!-- <version>5.7.0</version> -->
+		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>org.apache.xbean</groupId>
@@ -169,11 +169,11 @@
 			<artifactId>aspectjrt</artifactId>
 			<version>${org.aspectj-version}</version>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>mysql</groupId> -->
-<!-- 			<artifactId>mysql-connector-java</artifactId> -->
-<!-- 			<version>5.1.40</version> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>mysql</groupId> -->
+		<!-- <artifactId>mysql-connector-java</artifactId> -->
+		<!-- <version>5.1.40</version> -->
+		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -246,12 +246,12 @@
 			<version>4.0.0-release</version>
 
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.datanucleus</groupId> -->
-<!-- 			<artifactId>datanucleus-rdbms</artifactId> -->
-<!-- 			<version>[5.0.0-release, )</version> -->
-<!-- 			<scope>runtime</scope> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.datanucleus</groupId> -->
+		<!-- <artifactId>datanucleus-rdbms</artifactId> -->
+		<!-- <version>[5.0.0-release, )</version> -->
+		<!-- <scope>runtime</scope> -->
+		<!-- </dependency> -->
 		<!-- https://mvnrepository.com/artifact/org.datanucleus/datanucleus-api-jpa -->
 
 		<!-- https://mvnrepository.com/artifact/com.google.appengine.orm/datanucleus-appengine -->
@@ -373,16 +373,14 @@
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<hibernate.version>5.1.5.Final</hibernate.version>
 		<org.aspectj-version>1.7.4</org.aspectj-version>
-		 
-<!-- INSTANCE_CONNECTION_NAME from Cloud Console > SQL > Instance Details > Properties
-     or gcloud sql instances describe <instance>
-     project:region:instance for Cloud SQL 2nd Generation or
-     project:instance        for Cloud SQL 1st Generation
--->
-    <INSTANCE_CONNECTION_NAME>syena-system:asia-east1:syena-db</INSTANCE_CONNECTION_NAME>
-    <user>root</user>
-    <password>admin@1</password>
-    <database>syena_db</database>
+
+		<!-- INSTANCE_CONNECTION_NAME from Cloud Console > SQL > Instance Details 
+			> Properties or gcloud sql instances describe <instance> project:region:instance 
+			for Cloud SQL 2nd Generation or project:instance for Cloud SQL 1st Generation -->
+		<INSTANCE_CONNECTION_NAME>syena-system:asia-east1:syena-db</INSTANCE_CONNECTION_NAME>
+		<user>root</user>
+		<password>admin@1</password>
+		<database>syena_db</database>
 	</properties>
 
 

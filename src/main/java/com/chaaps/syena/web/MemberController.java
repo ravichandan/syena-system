@@ -21,7 +21,6 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,7 +72,7 @@ public class MemberController {
 	WatchService watchService;
 
 	@Autowired
-	JmsTemplate jmsTemplate;
+	LocationUpdateComponent locationUpdateComponent;
 
 	@GET
 	@Path("test")
@@ -413,7 +412,7 @@ public class MemberController {
 				return Response.notModified().entity("Valid 'Member' entry not found with given email").build();
 			}
 
-			jmsTemplate.convertAndSend(locationUpdateRequest);
+			locationUpdateComponent.addRequest(locationUpdateRequest);
 		} catch (Exception e) {
 			logger.error(getStackTrace(e));
 			e.printStackTrace();

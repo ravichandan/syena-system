@@ -81,14 +81,14 @@
 		<property name="subject" value="Syena Verification PIN " />
 	</bean>
 
-	<bean id="jmsListenerContainerFactory"
+	<!-- <bean id="jmsListenerContainerFactory"
 		class="org.springframework.jms.config.DefaultJmsListenerContainerFactory">
 		<property name="connectionFactory" ref="activeConnFactory"></property>
-	</bean>
+	</bean> -->
 	<!-- <bean id="jmsConnFactory" class="org.springframework.jms.connection.CachingConnectionFactory"> 
 		<property name="targetConnectionFactory" ref="activeConnFactory"></property> 
 		</bean> -->
-	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+	<!-- <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
 		<property name="connectionFactory" ref="activeConnFactory"></property>
 		<property name="defaultDestinationName" value="location_update_queue"></property>
 	</bean>
@@ -99,5 +99,5 @@
 	</amq:broker>
 
 	<amq:connectionFactory id="activeConnFactory"
-		brokerURL="vm://localhost" />
+		brokerURL="vm://localhost" /> -->
 </beans>
