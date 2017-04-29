@@ -373,6 +373,16 @@
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<hibernate.version>5.1.5.Final</hibernate.version>
 		<org.aspectj-version>1.7.4</org.aspectj-version>
+		 
+<!-- INSTANCE_CONNECTION_NAME from Cloud Console > SQL > Instance Details > Properties
+     or gcloud sql instances describe <instance>
+     project:region:instance for Cloud SQL 2nd Generation or
+     project:instance        for Cloud SQL 1st Generation
+-->
+    <INSTANCE_CONNECTION_NAME>syena-system:asia-east1:syena-db</INSTANCE_CONNECTION_NAME>
+    <user>root</user>
+    <password>admin@1</password>
+    <database>syena_db</database>
 	</properties>
 
 
