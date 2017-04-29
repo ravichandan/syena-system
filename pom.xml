@@ -381,7 +381,6 @@
 		<user>root</user>
 		<password>admin@1</password>
 		<database>syena_db</database>
-		<cloudsql.url>jdbc:google:mysql://syena-system:asia-east1:syena-db/demo?user=root</cloudsql.url>
 	</properties>
 
 

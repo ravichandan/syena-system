@@ -55,10 +55,10 @@
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="username" value="root"></property>
-<!-- 		<property name="password" value="admin@1"></property> -->
+		<!-- <property name="password" value="admin@1"></property> -->
 		<property name="driverClassName" value="com.mysql.jdbc.GoogleDriver"></property>
 		<property name="url"
-			value="jdbc:google:mysql://syena-system:asia-east1:syena-db/syena_db?cloudSqlInstance=syena-system:asia-east1:syena-db&amp;socketFactory=com.google.cloud.sql.mysql.SocketFactory&amp;useSSL=false"></property>
+			value="jdbc:google:mysql://syena-system:syena-db/syena_db?user=root&amp;cloudSqlInstance=syena-system:asia-east1:syena-db&amp;socketFactory=com.google.cloud.sql.mysql.SocketFactory&amp;useSSL=false"></property>
 	</bean>
 	<!-- hibernate.cache.use_second_level_cache = false hibernate.cache.region.factory_class 
 		= org.hibernate.cache.ehcache.EhCacheRegionFactory hibernate.cache.use_query_cache 
@@ -81,23 +81,16 @@
 		<property name="subject" value="Syena Verification PIN " />
 	</bean>
 
-	<!-- <bean id="jmsListenerContainerFactory"
-		class="org.springframework.jms.config.DefaultJmsListenerContainerFactory">
-		<property name="connectionFactory" ref="activeConnFactory"></property>
-	</bean> -->
+	<!-- <bean id="jmsListenerContainerFactory" class="org.springframework.jms.config.DefaultJmsListenerContainerFactory"> 
+		<property name="connectionFactory" ref="activeConnFactory"></property> </bean> -->
 	<!-- <bean id="jmsConnFactory" class="org.springframework.jms.connection.CachingConnectionFactory"> 
 		<property name="targetConnectionFactory" ref="activeConnFactory"></property> 
 		</bean> -->
-	<!-- <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-		<property name="connectionFactory" ref="activeConnFactory"></property>
-		<property name="defaultDestinationName" value="location_update_queue"></property>
-	</bean>
-	<amq:broker useJmx="false" persistent="false">
-		<amq:transportConnectors>
-			<amq:transportConnector uri="tcp://localhost:0" />
-		</amq:transportConnectors>
-	</amq:broker>
-
-	<amq:connectionFactory id="activeConnFactory"
-		brokerURL="vm://localhost" /> -->
+	<!-- <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate"> 
+		<property name="connectionFactory" ref="activeConnFactory"></property> <property 
+		name="defaultDestinationName" value="location_update_queue"></property> </bean> 
+		<amq:broker useJmx="false" persistent="false"> <amq:transportConnectors> 
+		<amq:transportConnector uri="tcp://localhost:0" /> </amq:transportConnectors> 
+		</amq:broker> <amq:connectionFactory id="activeConnFactory" brokerURL="vm://localhost" 
+		/> -->
 </beans>
