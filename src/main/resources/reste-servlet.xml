@@ -55,14 +55,15 @@
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="username" value="root"></property>
-		<!-- <property name="password" value="admin@1"></property> -->
+		 <property name="password" value=""></property> 
 		<property name="driverClassName" value="com.mysql.jdbc.GoogleDriver"></property>
 		<property name="url"
-			value="jdbc:google:mysql://syena-system:syena-db/syena_db?user=root&amp;cloudSqlInstance=syena-system:asia-east1:syena-db&amp;socketFactory=com.google.cloud.sql.mysql.SocketFactory&amp;useSSL=false"></property>
+			value="jdbc:google:mysql://syena-system:syena-db/syena_db?user=root"></property>
 	</bean>
 	<!-- hibernate.cache.use_second_level_cache = false hibernate.cache.region.factory_class 
 		= org.hibernate.cache.ehcache.EhCacheRegionFactory hibernate.cache.use_query_cache 
 		= true -->
+<!-- 		&amp;cloudSqlInstance=syena-system:asia-east1:syena-db&amp;socketFactory=com.google.cloud.sql.mysql.SocketFactory&amp;useSSL=false -->
 	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<property name="host" value="smtp.gmail.com"></property>
 		<property name="username" value="sitiraju.kalyani@gmail.com"></property>
