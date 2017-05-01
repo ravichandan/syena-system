@@ -66,8 +66,8 @@
 <!-- 		&amp;cloudSqlInstance=syena-system:asia-east1:syena-db&amp;socketFactory=com.google.cloud.sql.mysql.SocketFactory&amp;useSSL=false -->
 	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<property name="host" value="smtp.gmail.com"></property>
-		<property name="username" value="sitiraju.kalyani@gmail.com"></property>
-		<property name="password" value="arunachalam"></property>
+		<property name="username" value="syenasystem@gmail.com"></property>
+		<property name="password" value="Forsyena@1"></property>
 		<property name="javaMailProperties">
 			<props>
 				<prop key="mail.smtp.auth">true</prop>
