@@ -461,12 +461,12 @@ public class MemberController {
 			ObjectMapper mapper = new ObjectMapper();
 			String request = mapper.writeValueAsString(locationUpdateRequest);
 			Queue queue = QueueFactory.getDefaultQueue();
-			queue.add(TaskOptions.Builder.withUrl("/location-update-worker")
+			queue.add(TaskOptions.Builder.withUrl("/member/location-update-worker")
 					.header(Constants.INSTALLATION_ID, installationId)
 					.payload(request));
 
 			URI uri = UriBuilder.fromResource(this.getClass())
-					.path("location-update-worker").build();
+					.path("member/location-update-worker").build();
 			logger.debug("Sending redirect to uri: " + uri.getPath());
 			return Response.seeOther(uri).build();
 		} catch (Exception e) {
