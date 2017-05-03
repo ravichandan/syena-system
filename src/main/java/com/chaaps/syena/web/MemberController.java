@@ -462,7 +462,7 @@ public class MemberController {
 			String request = mapper.writeValueAsString(locationUpdateRequest);
 			Queue queue = QueueFactory.getDefaultQueue();
 			queue.add(TaskOptions.Builder.withUrl("/location-update-worker")
-					.param(Constants.INSTALLATION_ID, installationId)
+					.header(Constants.INSTALLATION_ID, installationId)
 					.payload(request));
 
 			URI uri = UriBuilder.fromResource(this.getClass())
