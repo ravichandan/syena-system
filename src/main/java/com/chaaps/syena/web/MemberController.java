@@ -461,7 +461,7 @@ public class MemberController {
 			ObjectMapper mapper = new ObjectMapper();
 			String request = mapper.writeValueAsString(locationUpdateRequest);
 			Queue queue = QueueFactory.getDefaultQueue();
-			queue.add(TaskOptions.Builder.withUrl("../location-update-worker")
+			queue.add(TaskOptions.Builder.withUrl("/location-update-worker")
 					.param(Constants.INSTALLATION_ID, installationId)
 					.payload(request));
 
