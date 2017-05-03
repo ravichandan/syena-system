@@ -466,7 +466,7 @@ public class MemberController {
 					.payload(request));
 
 			URI uri = UriBuilder.fromResource(this.getClass())
-					.path("member/location-update-worker").build();
+					.path("/member/location-update-worker").build();
 			logger.debug("Sending redirect to uri: " + uri.getPath());
 			return Response.seeOther(uri).build();
 		} catch (Exception e) {
