@@ -20,7 +20,7 @@ import org.hibernate.annotations.GenerationTime;
  * 
  */
 @Entity
-@Table(name = "watch_configuration")
+@Table(name = "WATCH_CONFIGURATION")
 @NamedQuery(name = "WatchConfiguration.findAll", query = "SELECT w FROM WatchConfiguration w")
 public class WatchConfiguration implements Serializable {
 	private static final long serialVersionUID = 1L;

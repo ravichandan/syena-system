@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -38,8 +37,10 @@ public class LocationUpdateComponent {
 	private boolean runConsumer = false;
 	Thread consumerThread;
 
-	public void addRequest(LocationUpdateRequest locationUpdateRequest) throws InterruptedException {
-		if (queue.size() > 0 && (consumerThread == null || !consumerThread.isAlive())) {
+	public void addRequest(LocationUpdateRequest locationUpdateRequest)
+			throws InterruptedException {
+		if (queue.size() > 0
+				&& (consumerThread == null || !consumerThread.isAlive())) {
 			consumerThread = new Thread(new LocationConsumer());
 			runConsumer = true;
 			consumerThread.start();
@@ -68,25 +69,33 @@ public class LocationUpdateComponent {
 
 	// @JmsListener(destination = "location_update_queue", concurrency = "1")
 	public void receiveMessage(LocationUpdateRequest locationUpdateRequest) {
-		logger.info("JmsMessage received to update member's location : " + locationUpdateRequest);
+		logger.info("JmsMessage received to update member's location : "
+				+ locationUpdateRequest);
 
-		Member member = memberService.findByEmail(locationUpdateRequest.getRequester());
+		Member member = memberService.findByEmail(locationUpdateRequest
+				.getRequester());
 		if (member == null) {
 			return;
 		}
-		memberService.updateLocation(member, locationUpdateRequest.getLatitude(), locationUpdateRequest.getLongitude(),
+		memberService.updateLocation(member,
+				locationUpdateRequest.getLatitude(),
+				locationUpdateRequest.getLongitude(),
 				locationUpdateRequest.getAltitude());
 		logger.debug("Successfully updated location for " + member.getEmail());
 		logger.debug("Updating watch instance now");
 		watchService.updateWatchInstance(member);
-		List<Watch> watches = watchService.findByTargetMemberWithActiveWatch(member);
+		List<Watch> watches = watchService
+				.findByTargetMemberWithActiveWatch(member);
 		for (Watch w : watches) {
 			logger.debug("Watch Id : " + w.getId());
-			if (w.getOriginMember() == null || w.getOriginMember().getMemberRegistration() == null
-					|| w.getOriginMember().getMemberRegistration().getRegistrationToken() == null) {
+			if (w.getOriginMember() == null
+					|| w.getOriginMember().getMemberRegistration() == null
+					|| w.getOriginMember().getMemberRegistration()
+							.getRegistrationToken() == null) {
 				continue;
 			}
-			if (w.getWatchInstance() != null && w.getWatchConfigurations() != null
+			if (w.getWatchInstance() != null
+					&& w.getWatchConfigurations() != null
 					&& w.getWatchConfigurations().size() > 0) {
 
 				for (WatchConfiguration wc : w.getWatchConfigurations()) {
@@ -95,9 +104,13 @@ public class LocationUpdateComponent {
 						if (wc.getEntry().equals(Constants.SAFE_DISTANCE)) {
 							double safeDistance = Double.valueOf(wc.getValue());
 							logger.debug("Safe Distance : " + safeDistance);
-							if (safeDistance < w.getWatchInstance().getDistanceApart()) {
-								fcmSender.send(w.getOriginMember().getMemberRegistration().getRegistrationToken(),
-										w.getOriginMember().getEmail(), w.getStatus(), safeDistance);
+							if (safeDistance < w.getWatchInstance()
+									.getDistanceApart()) {
+								fcmSender.send(w.getOriginMember()
+										.getMemberRegistration()
+										.getRegistrationToken(), w
+										.getOriginMember().getEmail(), w
+										.getStatus(), safeDistance);
 							}
 						}
 					} catch (Exception e) {

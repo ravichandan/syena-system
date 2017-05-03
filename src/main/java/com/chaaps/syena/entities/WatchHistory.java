@@ -14,7 +14,7 @@ import java.math.BigInteger;
  * 
  */
 @Entity
-@Table(name = "watch_history")
+@Table(name = "WATCH_HISTORY")
 @NamedQuery(name = "WatchHistory.findAll", query = "SELECT w FROM WatchHistory w")
 public class WatchHistory implements Serializable {
 	private static final long serialVersionUID = 1L;

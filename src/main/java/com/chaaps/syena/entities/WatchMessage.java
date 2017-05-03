@@ -13,7 +13,7 @@ import java.sql.Timestamp;
  * 
  */
 @Entity
-@Table(name = "watch_message")
+@Table(name = "WATCH_MESSAGE")
 @NamedQuery(name = "WatchMessage.findAll", query = "SELECT w FROM WatchMessage w")
 public class WatchMessage implements Serializable {
 	private static final long serialVersionUID = 1L;
