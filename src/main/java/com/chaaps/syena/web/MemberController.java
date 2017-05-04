@@ -7,6 +7,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -16,6 +17,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -431,9 +433,11 @@ public class MemberController {
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response updateLocation(
 			@HeaderParam(Constants.INSTALLATION_ID) String installationId,
+			@Context HttpServletRequest req,
 			LocationUpdateRequest locationUpdateRequest) {
 
 		logger.info("Request received to '/location'");
+
 		if (StringUtils.isBlank(installationId)) {
 			logger.debug("Installation-Id is empty, returning error response");
 			return Response.notModified().build();
@@ -442,9 +446,11 @@ public class MemberController {
 			logger.debug("Email is invalid. Returning...");
 			return Response.notModified().entity("Email is invalid.").build();
 		}
+
 		try {
 			logger.debug("Primary validation successful. Requester: "
 					+ locationUpdateRequest.getRequester());
+
 			Member member = memberService.findByEmail(locationUpdateRequest
 					.getRequester());
 			if (member == null || !member.isActive()
@@ -460,15 +466,36 @@ public class MemberController {
 
 			ObjectMapper mapper = new ObjectMapper();
 			String request = mapper.writeValueAsString(locationUpdateRequest);
+
 			Queue queue = QueueFactory.getDefaultQueue();
-			queue.add(TaskOptions.Builder.withUrl("/member/location-update-worker")
+			queue.add(TaskOptions.Builder
+					.withUrl("/member/location-update-worker")
 					.header(Constants.INSTALLATION_ID, installationId)
 					.payload(request));
 
 			URI uri = UriBuilder.fromResource(this.getClass())
 					.path("member/location-update-worker").build();
 			logger.debug("Sending redirect to uri: " + uri.getPath());
-			return Response.seeOther(uri).build();
+
+			URI uri2 = UriBuilder.fromResource(this.getClass())
+					.path("/member/location-update-worker").build();
+			logger.debug("Sending redirect to uri: " + uri2.getPath());
+			URI uri3 = UriBuilder.fromResource(this.getClass()).path("/member")
+					.path("/location-update-worker").build();
+			logger.debug("Sending redirect to uri: " + uri3.getPath());
+			URI uri4 = UriBuilder.fromResource(this.getClass())
+					.path("./location-update-worker").build();
+			logger.debug("Sending redirect to uri: " + uri4.getPath());
+			URI uri5 = UriBuilder.fromResource(this.getClass())
+					.path("../location-update-worker").build();
+			logger.debug("Sending redirect to uri: " + uri5.getPath());
+			URI uri6 = UriBuilder.fromResource(this.getClass())
+					.path("/location-update-worker").build();
+			logger.debug("Sending redirect to uri: " + uri6.getPath());
+			URI uri7 = UriBuilder.fromUri(req.getRequestURI())
+					.path("/location-update-worker").build();
+			logger.debug("Sending redirect to uri: " + uri7.getPath());
+			return Response.seeOther(uri6).build();
 		} catch (Exception e) {
 			logger.error(getStackTrace(e));
 			e.printStackTrace();
